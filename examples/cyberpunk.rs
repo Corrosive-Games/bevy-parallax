@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
-use bevy_parallax::{LayerData, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource};
+use bevy_parallax::{
+    LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
+};
 
 fn main() {
     let window = WindowDescriptor {
@@ -55,7 +57,9 @@ fn main() {
 }
 
 pub fn initialize_camera_system(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands
+        .spawn_bundle(OrthographicCameraBundle::new_2d())
+        .insert(ParallaxCameraComponent);
 }
 
 pub fn move_camera_system(
