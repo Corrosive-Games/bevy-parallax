@@ -1,15 +1,20 @@
 use crate::layer;
 use bevy::prelude::*;
 
+/// Event used to update parallax
 pub struct ParallaxMoveEvent {
+    /// Speed to move camera (x direction)
     pub camera_move_speed: f32,
 }
 
 /// Resource for managing parallax
 #[derive(Debug)]
 pub struct ParallaxResource {
+    /// Data to describe each layer of parallax
     pub layer_data: Vec<layer::LayerData>,
+    /// Parallax layer entities
     pub layer_entities: Vec<Entity>,
+    /// Dimensions of window
     pub window_size: Vec2,
 }
 
@@ -35,10 +40,12 @@ impl ParallaxResource {
 
     /// Delete all layer entities in parallax resource and empty Vec
     pub fn despawn_layers(&mut self, commands: &mut Commands) {
+        // Remove all layer entities
         for entity in self.layer_entities.iter() {
             commands.entity(*entity).despawn_recursive();
         }
 
+        // Empty the layer entity vector
         self.layer_entities = vec![];
     }
 
@@ -49,11 +56,12 @@ impl ParallaxResource {
         asset_server: &AssetServer,
         texture_atlases: &mut Assets<TextureAtlas>,
     ) {
-        // despawn any existing layers
+        // Despawn any existing layers
         self.despawn_layers(commands);
 
-        // spawn new layers using layer_data
+        // Spawn new layers using layer_data
         for (i, layer) in self.layer_data.iter().enumerate() {
+            // Setup texture
             let texture_handle = asset_server.load(&layer.path);
             let texture_atlas =
                 TextureAtlas::from_grid(texture_handle, layer.tile_size, layer.cols, layer.rows);
@@ -62,11 +70,11 @@ impl ParallaxResource {
                 texture_atlas: texture_atlas_handle,
                 ..Default::default()
             };
+
+            // Three textures always spawned
             let mut texture_count = 3.0;
 
-            let mut furthest_right = None;
-            let mut furthest_left = None;
-
+            // Spawn parallax layer entity
             let mut entity_commands = commands.spawn();
             entity_commands
                 .insert(Name::new(format!("Parallax Layer ({})", i)))
@@ -77,7 +85,7 @@ impl ParallaxResource {
                 })
                 .insert(GlobalTransform::default())
                 .with_children(|parent| {
-                    // spawn center texture
+                    // Spawn center texture
                     parent.spawn_bundle(spritesheet_bundle.clone()).insert(
                         layer::LayerTextureComponent {
                             width: layer.tile_size.x,
@@ -87,20 +95,36 @@ impl ParallaxResource {
                     let mut max_x = (layer.tile_size.x / 2.0) * layer.scale;
                     let mut adjusted_spritesheet_bundle = spritesheet_bundle.clone();
 
-                    // spawn right texture
+                    // Spawn right texture
                     adjusted_spritesheet_bundle.transform.translation.x += layer.tile_size.x;
                     max_x += layer.tile_size.x * layer.scale;
-                    furthest_right = Some(
+                    parent
+                        .spawn_bundle(adjusted_spritesheet_bundle.clone())
+                        .insert(layer::LayerTextureComponent {
+                            width: layer.tile_size.x,
+                        });
+
+                    // Spawn left texture
+                    parent
+                        .spawn_bundle({
+                            let mut bundle = adjusted_spritesheet_bundle.clone();
+                            bundle.transform.translation.x *= -1.0;
+                            bundle
+                        })
+                        .insert(layer::LayerTextureComponent {
+                            width: layer.tile_size.x,
+                        });
+
+                    // Spawn additional textures to make 2 windows length of background textures
+                    while max_x < self.window_size.x {
+                        adjusted_spritesheet_bundle.transform.translation.x += layer.tile_size.x;
+                        max_x += layer.tile_size.x * layer.scale;
                         parent
                             .spawn_bundle(adjusted_spritesheet_bundle.clone())
                             .insert(layer::LayerTextureComponent {
                                 width: layer.tile_size.x,
-                            })
-                            .id(),
-                    );
+                            });
 
-                    // spawn left texture
-                    furthest_left = Some(
                         parent
                             .spawn_bundle({
                                 let mut bundle = adjusted_spritesheet_bundle.clone();
@@ -109,45 +133,20 @@ impl ParallaxResource {
                             })
                             .insert(layer::LayerTextureComponent {
                                 width: layer.tile_size.x,
-                            })
-                            .id(),
-                    );
-
-                    // spawn additional textures to make 2 windows length of background textures
-                    while max_x < self.window_size.x {
-                        adjusted_spritesheet_bundle.transform.translation.x += layer.tile_size.x;
-                        max_x += layer.tile_size.x * layer.scale;
-                        furthest_right = Some(
-                            parent
-                                .spawn_bundle(adjusted_spritesheet_bundle.clone())
-                                .insert(layer::LayerTextureComponent {
-                                    width: layer.tile_size.x,
-                                })
-                                .id(),
-                        );
-
-                        furthest_left = Some(
-                            parent
-                                .spawn_bundle({
-                                    let mut bundle = adjusted_spritesheet_bundle.clone();
-                                    bundle.transform.translation.x *= -1.0;
-                                    bundle
-                                })
-                                .insert(layer::LayerTextureComponent {
-                                    width: layer.tile_size.x,
-                                })
-                                .id(),
-                        );
+                            });
 
                         texture_count += 2.0;
                     }
                 });
 
+            // Add layer component to entity
             entity_commands.insert(layer::LayerComponent {
                 speed: layer.speed,
                 texture_count,
                 transition_factor: layer.transition_factor,
             });
+
+            // Push parallax layer entity to layer_entities
             self.layer_entities.push(entity_commands.id());
         }
     }

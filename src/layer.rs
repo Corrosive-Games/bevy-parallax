@@ -4,13 +4,21 @@ use serde::Deserialize;
 /// Layer initialization data
 #[derive(Debug, Deserialize)]
 pub struct LayerData {
+    /// Relative speed of layer to the camera movement
     pub speed: f32,
+    /// Path to layer texture file
     pub path: String,
+    /// Size of a tile of the texture
     pub tile_size: Vec2,
+    /// Columns in the texture file
     pub cols: usize,
+    /// Rows in the texture file
     pub rows: usize,
+    /// Scale of the texture
     pub scale: f32,
+    /// Z position of the layer
     pub z: f32,
+    /// Number used to determine when textures are moved to opposite side of camera
     pub transition_factor: f32,
 }
 
@@ -29,14 +37,20 @@ impl Default for LayerData {
     }
 }
 
+/// Core component for parallax layer
 #[derive(Component)]
 pub struct LayerComponent {
-    pub speed: f32, // speed of layer relative to camera
+    /// Relative speed of layer to the camera movement
+    pub speed: f32,
+    /// Number of textures in the layer
     pub texture_count: f32,
+    /// Number used to determine when textures are moved to opposite side of camera
     pub transition_factor: f32,
 }
 
+/// Core component for layer texture
 #[derive(Component)]
 pub struct LayerTextureComponent {
+    /// Width of the texture
     pub width: f32,
 }

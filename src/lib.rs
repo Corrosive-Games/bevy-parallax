@@ -16,6 +16,7 @@ impl Plugin for ParallaxPlugin {
     }
 }
 
+/// Initialize the parallax resource
 fn initialize_parallax_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -28,6 +29,7 @@ fn initialize_parallax_system(
     parallax_res.create_layers(&mut commands, &asset_server, &mut texture_atlases);
 }
 
+/// Move camera and background layers
 fn follow_camera_system(
     mut camera_query: Query<&mut Transform, With<parallax::ParallaxCameraComponent>>,
     mut layer_query: Query<
@@ -46,6 +48,7 @@ fn follow_camera_system(
     }
 }
 
+/// Update layer positions to keep the effect going indefinitely
 fn update_layer_textures_system(
     layer_query: Query<(&layer::LayerComponent, &Children)>,
     mut texture_query: Query<
@@ -65,11 +68,13 @@ fn update_layer_textures_system(
                 let (texture_gtransform, mut texture_transform, layer_texture) =
                     texture_query.get_mut(child).unwrap();
 
+                // Move right-most texture to left side of layer when camera is approaching left-most end
                 if camera_transform.translation.x - texture_gtransform.translation.x
                     + ((layer_texture.width * texture_gtransform.scale.x) / 2.0)
                     < -(parallax_resource.window_size.x * layer.transition_factor)
                 {
                     texture_transform.translation.x -= layer_texture.width * layer.texture_count;
+                // Move left-most texture to right side of layer when camera is approaching right-most end
                 } else if camera_transform.translation.x
                     - texture_gtransform.translation.x
                     - ((layer_texture.width * texture_gtransform.scale.x) / 2.0)
