@@ -9,6 +9,7 @@ license = "MIT"
 repository = "https://github.com/Corrosive-Games/bevy-parallax"
 categories = ["game-development", "games"]
 keywords = ["bevy", "gamedev", "parallax", "scrolling", "background"]
+exclude = ["assets/*"]
 
 [dependencies]
 bevy = "0.6.1"
