@@ -3,10 +3,11 @@ use bevy_inspector_egui::WorldInspectorPlugin;
 use bevy_parallax::{
     LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
 };
+use ron::de::from_bytes;
 
 fn main() {
     let window = WindowDescriptor {
-        title: "Cyberpunk".to_string(),
+        title: "Fishy".to_string(),
         width: 1280.0,
         height: 720.0,
         vsync: true,
@@ -17,38 +18,10 @@ fn main() {
     App::new()
         .insert_resource(window)
         .insert_resource(ParallaxResource {
-            layer_data: vec![
-                LayerData {
-                    speed: 0.9,
-                    path: "cyberpunk_back.png".to_string(),
-                    tile_size: Vec2::new(96.0, 160.0),
-                    cols: 1,
-                    rows: 1,
-                    scale: 4.5,
-                    z: 0.0,
-                    ..Default::default()
-                },
-                LayerData {
-                    speed: 0.6,
-                    path: "cyberpunk_middle.png".to_string(),
-                    tile_size: Vec2::new(144.0, 160.0),
-                    cols: 1,
-                    rows: 1,
-                    scale: 4.5,
-                    z: 1.0,
-                    ..Default::default()
-                },
-                LayerData {
-                    speed: 0.1,
-                    path: "cyberpunk_front.png".to_string(),
-                    tile_size: Vec2::new(272.0, 160.0),
-                    cols: 1,
-                    rows: 1,
-                    scale: 4.5,
-                    z: 2.0,
-                    ..Default::default()
-                },
-            ],
+            layer_data: from_bytes::<Vec<LayerData>>(include_bytes!(
+                "../data/fishy_layer_data.ron"
+            ))
+            .unwrap(),
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)

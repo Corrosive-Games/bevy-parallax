@@ -7,12 +7,9 @@ description = "Bevy plugin for parallax backgrounds"
 readme = "README.md"
 license = "MIT"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 bevy = "0.6.1"
 imagesize = "0.9"
 bevy-inspector-egui = "0.8.2"
-
-[dev-dependencies]
-rstest = "0.6.4"
+ron = "0.7.0"
+serde = "1.0.136"
