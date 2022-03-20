@@ -3,9 +3,12 @@ name = "bevy-parallax"
 version = "0.1.0"
 authors = ["Carlo Supina <cdsupina@gmail.com>"]
 edition = "2021"
-description = "Bevy plugin for creating a parallax effect."
+description = "A Bevy plugin for creating a parallax effect."
 readme = "README.md"
 license = "MIT"
+repository = "https://github.com/Corrosive-Games/bevy-parallax"
+categories = ["game-development", "games"]
+keywords = ["bevy", "gamedev", "parallax", "scrolling", "background"]
 
 [dependencies]
 bevy = "0.6.1"
