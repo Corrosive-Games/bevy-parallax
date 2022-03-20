@@ -91,3 +91,7 @@ pub fn move_camera_system(
     }
 }
 ```
+
+## Credits
+- [Fish World Pack](https://spicylobster.itch.io/fish-world-pack)
+- [Warped City 2](https://ansimuz.itch.io/warped-city-2)
