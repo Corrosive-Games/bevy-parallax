@@ -3,13 +3,14 @@ name = "bevy-parallax"
 version = "0.1.0"
 authors = ["Carlo Supina <cdsupina@gmail.com>"]
 edition = "2021"
-description = "Bevy plugin for parallax backgrounds"
+description = "Bevy plugin for creating a parallax effect."
 readme = "README.md"
 license = "MIT"
 
 [dependencies]
 bevy = "0.6.1"
-imagesize = "0.9"
+serde = "1.0.136"
+
+[dev-dependencies]
 bevy-inspector-egui = "0.8.2"
 ron = "0.7.0"
-serde = "1.0.136"
