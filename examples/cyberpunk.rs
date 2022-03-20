@@ -5,6 +5,7 @@ use bevy_parallax::{
 };
 
 fn main() {
+    // Define window
     let window = WindowDescriptor {
         title: "Cyberpunk".to_string(),
         width: 1280.0,
@@ -16,6 +17,7 @@ fn main() {
 
     App::new()
         .insert_resource(window)
+        // Add parallax resource with layer data
         .insert_resource(ParallaxResource {
             layer_data: vec![
                 LayerData {
@@ -59,12 +61,14 @@ fn main() {
         .run();
 }
 
+// Put a ParallaxCameraComponent on the camera used for parallax
 pub fn initialize_camera_system(mut commands: Commands) {
     commands
         .spawn_bundle(OrthographicCameraBundle::new_2d())
         .insert(ParallaxCameraComponent);
 }
 
+// Send a ParallaxMoveEvent with the desired camera movement speed
 pub fn move_camera_system(
     keyboard_input: Res<Input<KeyCode>>,
     mut move_event_writer: EventWriter<ParallaxMoveEvent>,
