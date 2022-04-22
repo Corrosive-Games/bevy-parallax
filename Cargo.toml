@@ -1,6 +1,6 @@
 [package]
 name = "bevy-parallax"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Carlo Supina <cdsupina@gmail.com>"]
 edition = "2021"
 description = "A Bevy plugin for creating a parallax effect."
@@ -12,9 +12,9 @@ keywords = ["bevy", "gamedev", "parallax", "scrolling", "background"]
 exclude = ["assets/*"]
 
 [dependencies]
-bevy = "0.6.1"
+bevy = "0.7.0"
 serde = "1.0.136"
 
 [dev-dependencies]
-bevy-inspector-egui = "0.8.2"
+bevy-inspector-egui = "0.10.0"
 ron = "0.7.0"

@@ -10,7 +10,6 @@ fn main() {
         title: "Cyberpunk".to_string(),
         width: 1280.0,
         height: 720.0,
-        vsync: true,
         resizable: false,
         ..Default::default()
     };
