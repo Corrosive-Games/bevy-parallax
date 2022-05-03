@@ -79,7 +79,7 @@ impl ParallaxResource {
             entity_commands
                 .insert(Name::new(format!("Parallax Layer ({})", i)))
                 .insert(Transform {
-                    translation: Vec3::new(0.0, 0.0, layer.z),
+                    translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
                     scale: Vec3::new(layer.scale, layer.scale, 1.0),
                     ..Default::default()
                 })

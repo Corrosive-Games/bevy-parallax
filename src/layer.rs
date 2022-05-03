@@ -18,6 +18,8 @@ pub struct LayerData {
     pub scale: f32,
     /// Z position of the layer
     pub z: f32,
+    /// Default initial position of the Entity container
+    pub position: Vec2,
     /// Number used to determine when textures are moved to opposite side of camera
     pub transition_factor: f32,
 }
@@ -32,6 +34,7 @@ impl Default for LayerData {
             rows: 1,
             scale: 1.0,
             z: 0.0,
+            position: Vec2::ZERO,
             transition_factor: 1.2,
         }
     }
