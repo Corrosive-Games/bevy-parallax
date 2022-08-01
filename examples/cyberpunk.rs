@@ -1,5 +1,4 @@
-use bevy::prelude::*;
-use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy::{prelude::*, render::texture::ImageSettings};
 use bevy_parallax::{
     LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
 };
@@ -16,6 +15,8 @@ fn main() {
 
     App::new()
         .insert_resource(window)
+        // Use nearest filtering so our pixel art renders clear
+        .insert_resource(ImageSettings::default_nearest())
         // Add parallax resource with layer data
         .insert_resource(ParallaxResource {
             layer_data: vec![
@@ -53,7 +54,6 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(ParallaxPlugin)
         .add_startup_system(initialize_camera_system)
         .add_system(move_camera_system)
@@ -63,7 +63,7 @@ fn main() {
 // Put a ParallaxCameraComponent on the camera used for parallax
 pub fn initialize_camera_system(mut commands: Commands) {
     commands
-        .spawn_bundle(OrthographicCameraBundle::new_2d())
+        .spawn_bundle(Camera2dBundle::default())
         .insert(ParallaxCameraComponent);
 }
 

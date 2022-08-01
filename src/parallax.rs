@@ -78,12 +78,14 @@ impl ParallaxResource {
             let mut entity_commands = commands.spawn();
             entity_commands
                 .insert(Name::new(format!("Parallax Layer ({})", i)))
-                .insert(Transform {
-                    translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
-                    scale: Vec3::new(layer.scale, layer.scale, 1.0),
-                    ..Default::default()
+                .insert_bundle(SpatialBundle {
+                    transform: Transform {
+                        translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
+                        scale: Vec3::new(layer.scale, layer.scale, 1.0),
+                        ..default()
+                    },
+                    ..default()
                 })
-                .insert(GlobalTransform::default())
                 .with_children(|parent| {
                     // Spawn center texture
                     parent.spawn_bundle(spritesheet_bundle.clone()).insert(
