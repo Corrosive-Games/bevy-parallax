@@ -3,6 +3,7 @@ use serde::Deserialize;
 
 /// Layer initialization data
 #[derive(Debug, Deserialize)]
+#[serde(default)]
 pub struct LayerData {
     /// Relative speed of layer to the camera movement
     pub speed: f32,

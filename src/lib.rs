@@ -68,6 +68,8 @@ fn update_layer_textures_system(
                 let (texture_gtransform, mut texture_transform, layer_texture) =
                     texture_query.get_mut(child).unwrap();
 
+                let texture_gtransform = texture_gtransform.compute_transform();
+
                 // Move right-most texture to left side of layer when camera is approaching left-most end
                 if camera_transform.translation.x - texture_gtransform.translation.x
                     + ((layer_texture.width * texture_gtransform.scale.x) / 2.0)
