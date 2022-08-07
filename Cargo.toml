@@ -23,6 +23,8 @@ features = [
     "bevy_sprite",
     "bevy_asset",
     "bevy_winit",
+    "x11",
+    "png",
 ]
 
 [dev-dependencies]
