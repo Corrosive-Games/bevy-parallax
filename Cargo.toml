@@ -15,7 +15,7 @@ exclude = ["assets/*"]
 serde = "1.0.136"
 
 [dependencies.bevy]
-version = "0.8.0"
+version = "0.9.0"
 default-features = false
 features = [
     "bevy_render",
@@ -31,7 +31,7 @@ features = [
 ron = "0.7.0"
 
 [dev-dependencies.bevy]
-version = "0.8.0"
+version = "0.9.0"
 default-features = false
 features = ["x11", "png"]
 

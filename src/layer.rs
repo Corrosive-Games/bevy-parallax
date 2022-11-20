@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use serde::Deserialize;
 
 /// Layer initialization data
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Resource)]
 #[serde(default)]
 pub struct LayerData {
     /// Relative speed of layer to the camera movement
