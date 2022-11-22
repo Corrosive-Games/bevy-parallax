@@ -24,9 +24,6 @@ fn main() {
     };
 
     App::new()
-        .insert_resource(window)
-        // Use nearest filtering so pixel art renders clear
-        .insert_resource(ImageSettings::default_nearest())
         .insert_resource(ParallaxResource {
             layer_data: vec![
                 LayerData {
@@ -62,7 +59,15 @@ fn main() {
             ],
             ..Default::default()
         })
-        .add_plugins(DefaultPlugins)
+        .add_plugins(
+            DefaultPlugins
+                .set(WindowPlugin {
+                    window,
+                    ..default()
+                })
+                // Use nearest filtering so our pixel art renders clear
+                .set(ImagePlugin::default_nearest()),
+        )
         .add_plugin(ParallaxPlugin)
         .add_startup_system(initialize_camera_system)
         .add_system(move_camera_system)
