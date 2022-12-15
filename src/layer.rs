@@ -5,7 +5,8 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize, Resource)]
 #[serde(default)]
 pub struct LayerData {
-    /// Relative speed of layer to the camera movement
+    /// Relative speed of layer to the camera movement.
+    /// If one of the components is set to 1.0, the layer won't move in that direction.
     pub speed: Vec2,
     /// Path to layer texture file
     pub path: String,
