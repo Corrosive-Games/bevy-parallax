@@ -11,7 +11,7 @@ A parallax plugin for the [Bevy Engine](https://bevyengine.org/). This plugin al
 ```rust
 use bevy::prelude::*;
 use bevy_parallax::{
-    LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
+    LayerSpeed, LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
 };
 
 fn main() {
@@ -27,7 +27,7 @@ fn main() {
         .insert_resource(ParallaxResource {
             layer_data: vec![
                 LayerData {
-                    speed: Vec2::new(0.9, 0.6),
+                    speed: LayerSpeed::Horizontal(0.9),
                     path: "back.png".to_string(),
                     tile_size: Vec2::new(96.0, 160.0),
                     cols: 1,
@@ -37,7 +37,7 @@ fn main() {
                     ..Default::default()
                 },
                 LayerData {
-                    speed: Vec2::new(0.6, 0.6),
+                    speed: LayerSpeed::Horizontal(0.6),
                     path: "middle.png".to_string(),
                     tile_size: Vec2::new(144.0, 160.0),
                     cols: 1,
@@ -47,7 +47,7 @@ fn main() {
                     ..Default::default()
                 },
                 LayerData {
-                    speed: Vec2::new(0.1, 0.1),
+                    speed: LayerSpeed::Horizontal(0.1),
                     path: "front.png".to_string(),
                     tile_size: Vec2::new(272.0, 160.0),
                     cols: 1,
@@ -91,14 +91,6 @@ pub fn move_camera_system(
     } else if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(-3.0, 0.0),
-        });
-    } else if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
-        move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(0.0, 3.0),
-        });
-    } else if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
-        move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(0.0, -3.0),
         });
     }
 }

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_parallax::{
-    LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
+    LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin,
+    ParallaxResource,
 };
 
 fn main() {
@@ -18,7 +19,7 @@ fn main() {
         .insert_resource(ParallaxResource {
             layer_data: vec![
                 LayerData {
-                    speed: Vec2::new(0.9, 0.5),
+                    speed: LayerSpeed::Bidirectional(0.9, 0.9),
                     path: "sky-stars.png".to_string(),
                     tile_size: Vec2::new(53.0, 55.0),
                     cols: 1,
@@ -28,7 +29,7 @@ fn main() {
                     ..Default::default()
                 },
                 LayerData {
-                    speed: Vec2::new(0.0, 0.1),
+                    speed: LayerSpeed::Bidirectional(0.1, 0.5),
                     path: "sky-clouds.png".to_string(),
                     tile_size: Vec2::new(109.0, 43.0),
                     cols: 1,
@@ -75,11 +76,12 @@ pub fn move_camera_system(
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(-3.0, 0.0),
         });
-    }  else if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
+    }
+    if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(0.0, 3.0),
         });
-    }  else if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
+    } else if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(0.0, -3.0),
         });

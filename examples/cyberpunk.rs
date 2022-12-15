@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_parallax::{
-    LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
+    LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin,
+    ParallaxResource,
 };
 
 fn main() {
@@ -18,7 +19,7 @@ fn main() {
         .insert_resource(ParallaxResource {
             layer_data: vec![
                 LayerData {
-                    speed: Vec2::new(0.9, 0.0),
+                    speed: LayerSpeed::Horizontal(0.9),
                     path: "cyberpunk_back.png".to_string(),
                     tile_size: Vec2::new(96.0, 160.0),
                     cols: 1,
@@ -28,7 +29,7 @@ fn main() {
                     ..Default::default()
                 },
                 LayerData {
-                    speed: Vec2::new(0.6, 0.0),
+                    speed: LayerSpeed::Horizontal(0.6),
                     path: "cyberpunk_middle.png".to_string(),
                     tile_size: Vec2::new(144.0, 160.0),
                     cols: 1,
@@ -38,7 +39,7 @@ fn main() {
                     ..Default::default()
                 },
                 LayerData {
-                    speed: Vec2::new(0.1, 0.0),
+                    speed: LayerSpeed::Horizontal(0.1),
                     path: "cyberpunk_front.png".to_string(),
                     tile_size: Vec2::new(272.0, 160.0),
                     cols: 1,
