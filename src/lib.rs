@@ -40,9 +40,10 @@ fn follow_camera_system(
 ) {
     if let Some(mut camera_transform) = camera_query.iter_mut().next() {
         for event in move_events.iter() {
-            camera_transform.translation.x += event.camera_move_speed;
+            camera_transform.translation += event.camera_move_speed.extend(0.0);
             for (mut layer_transform, layer) in layer_query.iter_mut() {
-                layer_transform.translation.x += event.camera_move_speed * layer.speed;
+                layer_transform.translation.x += event.camera_move_speed.x * layer.speed.x;
+                layer_transform.translation.y += event.camera_move_speed.y * layer.speed.y;
             }
         }
     }
@@ -75,14 +76,29 @@ fn update_layer_textures_system(
                     + ((layer_texture.width * texture_gtransform.scale.x) / 2.0)
                     < -(parallax_resource.window_size.x * layer.transition_factor)
                 {
-                    texture_transform.translation.x -= layer_texture.width * layer.texture_count;
+                    texture_transform.translation.x -= layer_texture.width * layer.texture_count.x;
                 // Move left-most texture to right side of layer when camera is approaching right-most end
                 } else if camera_transform.translation.x
                     - texture_gtransform.translation.x
                     - ((layer_texture.width * texture_gtransform.scale.x) / 2.0)
                     > parallax_resource.window_size.x * layer.transition_factor
                 {
-                    texture_transform.translation.x += layer_texture.width * layer.texture_count;
+                    texture_transform.translation.x += layer_texture.width * layer.texture_count.x;
+                }
+
+                // Move the top texture to the bottom of the layer when the camera is approaching the bottom
+                if camera_transform.translation.y - texture_gtransform.translation.y
+                    + ((layer_texture.height * texture_gtransform.scale.y) / 2.0)
+                    < -(parallax_resource.window_size.y * layer.transition_factor)
+                {
+                    texture_transform.translation.y -= layer_texture.height * layer.texture_count.y;
+                // Move the bottom texture to the top of the layer when the camera is approaching the top
+                } else if camera_transform.translation.y
+                    - texture_gtransform.translation.y
+                    - ((layer_texture.height * texture_gtransform.scale.y) / 2.0)
+                    > parallax_resource.window_size.y * layer.transition_factor
+                {
+                    texture_transform.translation.y += layer_texture.height * layer.texture_count.y;
                 }
             }
         }

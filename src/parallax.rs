@@ -1,10 +1,12 @@
+use std::cmp::max;
+
 use crate::layer;
 use bevy::prelude::*;
 
 /// Event used to update parallax
 pub struct ParallaxMoveEvent {
-    /// Speed to move camera (x direction)
-    pub camera_move_speed: f32,
+    /// Speed to move camera
+    pub camera_move_speed: Vec2,
 }
 
 /// Resource for managing parallax
@@ -77,8 +79,24 @@ impl ParallaxResource {
                 ..Default::default()
             };
 
-            // Three textures always spawned
-            let mut texture_count = 3.0;
+            // Spawn a grid of textures, so that they convincingly wrap around the screen when scrolling.
+
+            // In every row of the grid, our goal is to have a central texture and at least two that surround it,
+            // plus as much as it would take to fill the rest of the window space in both directions. Same logic
+            // applies to vertical placement.
+
+            let y_max_index = max(
+                (self.window_size.y / (layer.tile_size.y * layer.scale) + 1.0) as i32,
+                1,
+            );
+            let x_max_index = max(
+                (self.window_size.x / (layer.tile_size.x * layer.scale) + 1.0) as i32,
+                1,
+            );
+            let texture_count = Vec2::new(
+                2.0 * x_max_index as f32 + 1.0,
+                2.0 * y_max_index as f32 + 1.0,
+            );
 
             // Spawn parallax layer entity
             let mut entity_commands = commands.spawn_empty();
@@ -93,57 +111,20 @@ impl ParallaxResource {
                     ..default()
                 })
                 .with_children(|parent| {
-                    // Spawn center texture
-                    parent
-                        .spawn(spritesheet_bundle.clone())
-                        .insert(layer::LayerTextureComponent {
-                            width: layer.tile_size.x,
-                        });
-
-                    let mut max_x = (layer.tile_size.x / 2.0) * layer.scale;
-                    let mut adjusted_spritesheet_bundle = spritesheet_bundle.clone();
-
-                    // Spawn right texture
-                    adjusted_spritesheet_bundle.transform.translation.x += layer.tile_size.x;
-                    max_x += layer.tile_size.x * layer.scale;
-                    parent.spawn(adjusted_spritesheet_bundle.clone()).insert(
-                        layer::LayerTextureComponent {
-                            width: layer.tile_size.x,
-                        },
-                    );
-
-                    // Spawn left texture
-                    parent
-                        .spawn({
-                            let mut bundle = adjusted_spritesheet_bundle.clone();
-                            bundle.transform.translation.x *= -1.0;
-                            bundle
-                        })
-                        .insert(layer::LayerTextureComponent {
-                            width: layer.tile_size.x,
-                        });
-
-                    // Spawn additional textures to make 2 windows length of background textures
-                    while max_x < self.window_size.x {
-                        adjusted_spritesheet_bundle.transform.translation.x += layer.tile_size.x;
-                        max_x += layer.tile_size.x * layer.scale;
-                        parent.spawn(adjusted_spritesheet_bundle.clone()).insert(
-                            layer::LayerTextureComponent {
-                                width: layer.tile_size.x,
-                            },
-                        );
-
-                        parent
-                            .spawn({
-                                let mut bundle = adjusted_spritesheet_bundle.clone();
-                                bundle.transform.translation.x *= -1.0;
-                                bundle
-                            })
-                            .insert(layer::LayerTextureComponent {
-                                width: layer.tile_size.x,
-                            });
-
-                        texture_count += 2.0;
+                    for j in -x_max_index..=x_max_index {
+                        for k in -y_max_index..=y_max_index {
+                            let mut adjusted_spritesheet_bundle = spritesheet_bundle.clone();
+                            adjusted_spritesheet_bundle.transform.translation.x =
+                                layer.tile_size.x * j as f32;
+                            adjusted_spritesheet_bundle.transform.translation.y =
+                                layer.tile_size.y * k as f32;
+                            parent.spawn(adjusted_spritesheet_bundle).insert(
+                                layer::LayerTextureComponent {
+                                    width: layer.tile_size.x,
+                                    height: layer.tile_size.y,
+                                },
+                            );
+                        }
                     }
                 });
 

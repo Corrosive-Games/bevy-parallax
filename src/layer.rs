@@ -6,7 +6,7 @@ use serde::Deserialize;
 #[serde(default)]
 pub struct LayerData {
     /// Relative speed of layer to the camera movement
-    pub speed: f32,
+    pub speed: Vec2,
     /// Path to layer texture file
     pub path: String,
     /// Size of a tile of the texture
@@ -28,7 +28,7 @@ pub struct LayerData {
 impl Default for LayerData {
     fn default() -> Self {
         Self {
-            speed: 1.0,
+            speed: Vec2::X,
             path: "".to_string(),
             tile_size: Vec2::ZERO,
             cols: 1,
@@ -45,9 +45,9 @@ impl Default for LayerData {
 #[derive(Component)]
 pub struct LayerComponent {
     /// Relative speed of layer to the camera movement
-    pub speed: f32,
-    /// Number of textures in the layer
-    pub texture_count: f32,
+    pub speed: Vec2,
+    /// Number of rows (x) and columns (y) with the textures in the layer
+    pub texture_count: Vec2,
     /// Number used to determine when textures are moved to opposite side of camera
     pub transition_factor: f32,
 }
@@ -57,4 +57,7 @@ pub struct LayerComponent {
 pub struct LayerTextureComponent {
     /// Width of the texture
     pub width: f32,
+
+    /// Height of the texture
+    pub height: f32,
 }
