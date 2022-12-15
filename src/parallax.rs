@@ -80,19 +80,26 @@ impl ParallaxResource {
             };
 
             // Spawn a grid of textures, so that they convincingly wrap around the screen when scrolling.
+            // For unidirectional layers, only spawn a single row or column in direction of their movement.
 
             // In every row of the grid, our goal is to have a central texture and at least two that surround it,
             // plus as much as it would take to fill the rest of the window space in both directions. Same logic
             // applies to vertical placement.
 
-            let y_max_index = max(
-                (self.window_size.y / (layer.tile_size.y * layer.scale) + 1.0) as i32,
-                1,
-            );
-            let x_max_index = max(
-                (self.window_size.x / (layer.tile_size.x * layer.scale) + 1.0) as i32,
-                1,
-            );
+            let y_max_index = match layer.speed {
+                layer::LayerSpeed::Vertical(_) | layer::LayerSpeed::Bidirectional(..) => max(
+                    (self.window_size.y / (layer.tile_size.y * layer.scale) + 1.0) as i32,
+                    1,
+                ),
+                layer::LayerSpeed::Horizontal(_) => 0,
+            };
+            let x_max_index = match layer.speed {
+                layer::LayerSpeed::Horizontal(_) | layer::LayerSpeed::Bidirectional(..) => max(
+                    (self.window_size.x / (layer.tile_size.x * layer.scale) + 1.0) as i32,
+                    1,
+                ),
+                layer::LayerSpeed::Vertical(_) => 0,
+            };
             let texture_count = Vec2::new(
                 2.0 * x_max_index as f32 + 1.0,
                 2.0 * y_max_index as f32 + 1.0,
@@ -130,7 +137,11 @@ impl ParallaxResource {
 
             // Add layer component to entity
             entity_commands.insert(layer::LayerComponent {
-                speed: layer.speed,
+                speed: match layer.speed {
+                    layer::LayerSpeed::Horizontal(vx) => Vec2::new(vx, 0.0),
+                    layer::LayerSpeed::Vertical(vy) => Vec2::new(0.0, vy),
+                    layer::LayerSpeed::Bidirectional(vx, vy) => Vec2::new(vx, vy),
+                },
                 texture_count,
                 transition_factor: layer.transition_factor,
             });

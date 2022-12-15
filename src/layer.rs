@@ -1,13 +1,23 @@
 use bevy::prelude::*;
 use serde::Deserialize;
 
+/// Layer speed type.
+/// Layers with horizontal or vertical speed are only able to travel in one direction,
+/// while bidirectional layers can be scrolled endlessly in both directions.
+#[derive(Debug, Deserialize)]
+pub enum LayerSpeed {
+    Horizontal(f32),
+    Vertical(f32),
+    Bidirectional(f32, f32),
+}
+
 /// Layer initialization data
 #[derive(Debug, Deserialize, Resource)]
 #[serde(default)]
 pub struct LayerData {
     /// Relative speed of layer to the camera movement.
-    /// If one of the components is set to 1.0, the layer won't move in that direction.
-    pub speed: Vec2,
+    /// If the speed value is set to 1.0, the layer won't move in that direction.
+    pub speed: LayerSpeed,
     /// Path to layer texture file
     pub path: String,
     /// Size of a tile of the texture
@@ -29,7 +39,7 @@ pub struct LayerData {
 impl Default for LayerData {
     fn default() -> Self {
         Self {
-            speed: Vec2::X,
+            speed: LayerSpeed::Horizontal(1.0),
             path: "".to_string(),
             tile_size: Vec2::ZERO,
             cols: 1,
