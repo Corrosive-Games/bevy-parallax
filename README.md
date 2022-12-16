@@ -9,9 +9,9 @@ A parallax plugin for the [Bevy Engine](https://bevyengine.org/). This plugin al
 ## Usage
 
 ```rust
-use bevy::{prelude::*, render::texture::ImageSettings};
+use bevy::prelude::*;
 use bevy_parallax::{
-    LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
+    LayerSpeed, LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
 };
 
 fn main() {
@@ -27,7 +27,7 @@ fn main() {
         .insert_resource(ParallaxResource {
             layer_data: vec![
                 LayerData {
-                    speed: 0.9,
+                    speed: LayerSpeed::Horizontal(0.9),
                     path: "back.png".to_string(),
                     tile_size: Vec2::new(96.0, 160.0),
                     cols: 1,
@@ -37,7 +37,7 @@ fn main() {
                     ..Default::default()
                 },
                 LayerData {
-                    speed: 0.6,
+                    speed: LayerSpeed::Horizontal(0.6),
                     path: "middle.png".to_string(),
                     tile_size: Vec2::new(144.0, 160.0),
                     cols: 1,
@@ -47,7 +47,7 @@ fn main() {
                     ..Default::default()
                 },
                 LayerData {
-                    speed: 0.1,
+                    speed: LayerSpeed::Horizontal(0.1),
                     path: "front.png".to_string(),
                     tile_size: Vec2::new(272.0, 160.0),
                     cols: 1,
@@ -86,11 +86,11 @@ pub fn move_camera_system(
 ) {
     if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: 3.0,
+            camera_move_speed: Vec2::new(3.0, 0.0),
         });
     } else if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: -3.0,
+            camera_move_speed: Vec2::new(-3.0, 0.0),
         });
     }
 }

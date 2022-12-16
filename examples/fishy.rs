@@ -52,11 +52,11 @@ pub fn move_camera_system(
 ) {
     if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: 3.0,
+            camera_move_speed: Vec2::new(3.0, 0.0),
         });
     } else if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: -3.0,
+            camera_move_speed: Vec2::new(-3.0, 0.0),
         });
     }
 }

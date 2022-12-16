@@ -7,7 +7,7 @@ use bevy_parallax::{
 fn main() {
     // Define window
     let window = WindowDescriptor {
-        title: "Cyberpunk".to_string(),
+        title: "Sky".to_string(),
         width: 1280.0,
         height: 720.0,
         resizable: false,
@@ -19,33 +19,23 @@ fn main() {
         .insert_resource(ParallaxResource {
             layer_data: vec![
                 LayerData {
-                    speed: LayerSpeed::Horizontal(0.9),
-                    path: "cyberpunk_back.png".to_string(),
-                    tile_size: Vec2::new(96.0, 160.0),
+                    speed: LayerSpeed::Bidirectional(0.9, 0.9),
+                    path: "sky-stars.png".to_string(),
+                    tile_size: Vec2::new(53.0, 55.0),
                     cols: 1,
                     rows: 1,
-                    scale: 4.5,
+                    scale: 3.0,
                     z: 0.0,
                     ..Default::default()
                 },
                 LayerData {
-                    speed: LayerSpeed::Horizontal(0.6),
-                    path: "cyberpunk_middle.png".to_string(),
-                    tile_size: Vec2::new(144.0, 160.0),
+                    speed: LayerSpeed::Bidirectional(0.1, 0.5),
+                    path: "sky-clouds.png".to_string(),
+                    tile_size: Vec2::new(109.0, 43.0),
                     cols: 1,
                     rows: 1,
-                    scale: 4.5,
+                    scale: 4.0,
                     z: 1.0,
-                    ..Default::default()
-                },
-                LayerData {
-                    speed: LayerSpeed::Horizontal(0.1),
-                    path: "cyberpunk_front.png".to_string(),
-                    tile_size: Vec2::new(272.0, 160.0),
-                    cols: 1,
-                    rows: 1,
-                    scale: 4.5,
-                    z: 2.0,
                     ..Default::default()
                 },
             ],
@@ -85,6 +75,15 @@ pub fn move_camera_system(
     } else if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(-3.0, 0.0),
+        });
+    }
+    if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
+        move_event_writer.send(ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(0.0, 3.0),
+        });
+    } else if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
+        move_event_writer.send(ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(0.0, -3.0),
         });
     }
 }

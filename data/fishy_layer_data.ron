@@ -1,6 +1,6 @@
 [
 	(
-		speed: 0.9,
+		speed: Horizontal(0.9),
 		path: "fishy_back.png",
 		tile_size: (256.0, 596.0),
 		cols: 1,
@@ -10,7 +10,7 @@
 		transition_factor: 1.2,
 	),
 	(
-		speed: 0.8,
+		speed: Horizontal(0.8),
 		path: "fishy_middle_1.png",
 		tile_size: (256.0, 596.0),
 		cols: 1,
@@ -20,7 +20,7 @@
 		transition_factor: 1.2,
 	),
 	(
-		speed: 0.6,
+		speed: Horizontal(0.6),
 		path: "fishy_middle_2.png",
 		tile_size: (256.0, 596.0),
 		cols: 1,
@@ -30,7 +30,7 @@
 		transition_factor: 1.2,
 	),
 	(
-		speed: 0.5,
+		speed: Horizontal(0.5),
 		path: "fishy_middle_3.png",
 		tile_size: (256.0, 596.0),
 		cols: 1,
@@ -40,7 +40,7 @@
 		transition_factor: 1.2,
 	),
 	(
-		speed: 0.4,
+		speed: Horizontal(0.4),
 		path: "fishy_middle_4.png",
 		tile_size: (256.0, 596.0),
 		cols: 1,
@@ -50,7 +50,7 @@
 		transition_factor: 1.2,
 	),
 	(
-		speed: 0.2,
+		speed: Horizontal(0.2),
 		path: "fishy_front.png",
 		tile_size: (256.0, 596.0),
 		cols: 1,
