@@ -6,10 +6,9 @@ use bevy_parallax::{
 
 fn main() {
     // Define window
-    let window = WindowDescriptor {
+    let primary_window = Window {
         title: "Cyberpunk".to_string(),
-        width: 1280.0,
-        height: 720.0,
+        resolution: (1280.0, 720.0).into(),
         resizable: false,
         ..Default::default()
     };
@@ -54,7 +53,7 @@ fn main() {
         .add_plugins(
             DefaultPlugins
                 .set(WindowPlugin {
-                    window,
+                    primary_window: Some(primary_window),
                     ..default()
                 })
                 // Use nearest filtering so our pixel art renders clear
