@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::PrimaryWindow};
 
 pub mod layer;
 pub mod parallax;
@@ -11,8 +11,8 @@ impl Plugin for ParallaxPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<parallax::ParallaxMoveEvent>()
             .add_startup_system(initialize_parallax_system)
-            .add_system(follow_camera_system.label("follow_camera"))
-            .add_system(update_layer_textures_system.after("follow_camera"));
+            .add_system(follow_camera_system)
+            .add_system(update_layer_textures_system.after(follow_camera_system));
     }
 }
 
@@ -21,11 +21,12 @@ fn initialize_parallax_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    windows: Res<Windows>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
     mut parallax_res: ResMut<parallax::ParallaxResource>,
 ) {
-    let window = windows.get_primary().unwrap();
-    parallax_res.window_size = Vec2::new(window.width(), window.height());
+    //let window = windows.get_primary().unwrap();
+    let primary_window = window_query.get_single().unwrap();
+    parallax_res.window_size = Vec2::new(primary_window.width(), primary_window.height());
     parallax_res.create_layers(&mut commands, &asset_server, &mut texture_atlases);
 }
 
