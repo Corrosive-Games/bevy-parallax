@@ -9,12 +9,19 @@ pub use parallax::*;
 pub struct ParallaxPlugin;
 impl Plugin for ParallaxPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<parallax::ParallaxMoveEvent>()
+        app.add_event::<ParallaxMoveEvent>()
             .add_startup_system(initialize_parallax_system)
-            .add_system(follow_camera_system)
-            .add_system(update_layer_textures_system.after(follow_camera_system));
+            .add_system(follow_camera_system.in_set(ParallaxSystems))
+            .add_system(
+                update_layer_textures_system
+                    .in_set(ParallaxSystems)
+                    .after(follow_camera_system),
+            );
     }
 }
+
+#[derive(SystemSet, Clone, PartialEq, Eq, Debug, Hash)]
+pub struct ParallaxSystems;
 
 /// Initialize the parallax resource
 fn initialize_parallax_system(
@@ -22,9 +29,8 @@ fn initialize_parallax_system(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    mut parallax_res: ResMut<parallax::ParallaxResource>,
+    mut parallax_res: ResMut<ParallaxResource>,
 ) {
-    //let window = windows.get_primary().unwrap();
     let primary_window = window_query.get_single().unwrap();
     parallax_res.window_size = Vec2::new(primary_window.width(), primary_window.height());
     parallax_res.create_layers(&mut commands, &asset_server, &mut texture_atlases);
@@ -32,12 +38,9 @@ fn initialize_parallax_system(
 
 /// Move camera and background layers
 fn follow_camera_system(
-    mut camera_query: Query<&mut Transform, With<parallax::ParallaxCameraComponent>>,
-    mut layer_query: Query<
-        (&mut Transform, &layer::LayerComponent),
-        Without<parallax::ParallaxCameraComponent>,
-    >,
-    mut move_events: EventReader<parallax::ParallaxMoveEvent>,
+    mut camera_query: Query<&mut Transform, With<ParallaxCameraComponent>>,
+    mut layer_query: Query<(&mut Transform, &LayerComponent), Without<ParallaxCameraComponent>>,
+    mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
     if let Some(mut camera_transform) = camera_query.iter_mut().next() {
         for event in move_events.iter() {
@@ -52,17 +55,13 @@ fn follow_camera_system(
 
 /// Update layer positions to keep the effect going indefinitely
 fn update_layer_textures_system(
-    layer_query: Query<(&layer::LayerComponent, &Children)>,
+    layer_query: Query<(&LayerComponent, &Children)>,
     mut texture_query: Query<
-        (
-            &GlobalTransform,
-            &mut Transform,
-            &layer::LayerTextureComponent,
-        ),
-        Without<parallax::ParallaxCameraComponent>,
+        (&GlobalTransform, &mut Transform, &LayerTextureComponent),
+        Without<ParallaxCameraComponent>,
     >,
-    camera_query: Query<&Transform, With<parallax::ParallaxCameraComponent>>,
-    parallax_resource: Res<parallax::ParallaxResource>,
+    camera_query: Query<&Transform, With<ParallaxCameraComponent>>,
+    parallax_resource: Res<ParallaxResource>,
 ) {
     if let Some(camera_transform) = camera_query.iter().next() {
         for (layer, children) in layer_query.iter() {
