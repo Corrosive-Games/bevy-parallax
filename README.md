@@ -11,7 +11,7 @@ A parallax plugin for the [Bevy Engine](https://bevyengine.org/). This plugin al
 ```rust
 use bevy::prelude::*;
 use bevy_parallax::{
-    LayerSpeed, LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource,
+    LayerSpeed, LayerData, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxResource, ParallaxSystems
 };
 
 fn main() {
@@ -69,7 +69,7 @@ fn main() {
         )
         .add_plugin(ParallaxPlugin)
         .add_startup_system(initialize_camera_system)
-        .add_system(move_camera_system)
+        .add_system(move_camera_system.before(ParallaxSystems))
         .run();
 }
 
