@@ -1,6 +1,6 @@
 [package]
 name = "bevy-parallax"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Carlo Supina <cdsupina@gmail.com>"]
 edition = "2021"
 description = "A Bevy plugin for creating a parallax effect."
