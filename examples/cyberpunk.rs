@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_parallax::{
     LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin,
-    ParallaxResource,
+    ParallaxResource, ParallaxSystems,
 };
 
 fn main() {
@@ -61,7 +61,7 @@ fn main() {
         )
         .add_plugin(ParallaxPlugin)
         .add_startup_system(initialize_camera_system)
-        .add_system(move_camera_system)
+        .add_system(move_camera_system.before(ParallaxSystems))
         .run();
 }
 
