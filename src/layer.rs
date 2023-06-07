@@ -34,6 +34,8 @@ pub struct LayerData {
     pub position: Vec2,
     /// Number used to determine when textures are moved to opposite side of camera
     pub transition_factor: f32,
+
+    pub color: Color,
 }
 
 impl Default for LayerData {
@@ -48,6 +50,7 @@ impl Default for LayerData {
             z: 0.0,
             position: Vec2::ZERO,
             transition_factor: 1.2,
+            color: Color::WHITE,
         }
     }
 }

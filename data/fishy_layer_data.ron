@@ -8,6 +8,12 @@
 		scale: 1.25,
 		z: 0.0,
 		transition_factor: 1.2,
+		color: Rgba(
+			red: 0.5,
+	        green: 0.8,
+        	blue: 1.,
+	        alpha: 1.,
+		)
 	),
 	(
 		speed: Horizontal(0.8),
@@ -18,6 +24,12 @@
 		scale: 1.25,
 		z: 1.0,
 		transition_factor: 1.2,
+		color: Rgba(
+			red: 0.5,
+	        green: 0.8,
+        	blue: 1.,
+	        alpha: 1.,
+		)
 	),
 	(
 		speed: Horizontal(0.6),
@@ -28,6 +40,12 @@
 		scale: 1.25,
 		z: 2.0,
 		transition_factor: 1.2,
+		color: Rgba(
+			red: 0.7,
+	        green: 0.6,
+        	blue: 0.4,
+	        alpha: 1.,
+		)
 	),
 	(
 		speed: Horizontal(0.5),
@@ -38,6 +56,12 @@
 		scale: 1.25,
 		z: 3.0,
 		transition_factor: 1.2,
+		color: Rgba(
+			red: 0.7,
+	        green: 0.6,
+        	blue: 0.4,
+	        alpha: 1.,
+		)
 	),
 	(
 		speed: Horizontal(0.4),
@@ -48,6 +72,12 @@
 		scale: 1.25,
 		z: 4.0,
 		transition_factor: 1.2,
+		color: Rgba(
+			red: 0.7,
+	        green: 0.6,
+        	blue: 0.4,
+	        alpha: 1.,
+		)
 	),
 	(
 		speed: Horizontal(0.2),
@@ -58,5 +88,11 @@
 		scale: 1.25,
 		z: 5.0,
 		transition_factor: 1.2,
+		color: Rgba(
+			red: 0.7,
+	        green: 0.6,
+        	blue: 0.4,
+	        alpha: 1.,
+		)
 	),
 ]

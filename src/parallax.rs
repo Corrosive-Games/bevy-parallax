@@ -76,6 +76,10 @@ impl ParallaxResource {
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
             let spritesheet_bundle = SpriteSheetBundle {
                 texture_atlas: texture_atlas_handle,
+                sprite: TextureAtlasSprite {
+                    color: layer.color,
+                    ..default()
+                },
                 ..Default::default()
             };
 
