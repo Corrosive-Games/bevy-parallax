@@ -3,68 +3,25 @@ use std::cmp::max;
 use crate::layer;
 use bevy::prelude::*;
 
-/// Event used to update parallax
-pub struct ParallaxMoveEvent {
-    /// Speed to move camera
-    pub camera_move_speed: Vec2,
-
+/// Event to setup and create parallax
+#[derive(Debug)]
+pub struct CreateParallaxEvent {
+    pub layers_data: Vec<layer::LayerData>,
     pub camera: Entity,
 }
 
-/// Resource for managing parallax
-#[derive(Debug, Resource)]
-pub struct ParallaxResource {
-    /// Data to describe each layer of parallax
-    pub layer_data: Vec<layer::LayerData>,
-    /// Parallax layer entities
-    pub layer_entities: Vec<Entity>,
-    /// Dimensions of window
-    pub window_size: Vec2,
-}
-
-impl Default for ParallaxResource {
-    fn default() -> Self {
-        Self {
-            layer_data: vec![],
-            layer_entities: vec![],
-            window_size: Vec2::ZERO,
-        }
-    }
-}
-
-impl ParallaxResource {
-    /// Create a new parallax resource
-    pub fn new(layer_data: Vec<layer::LayerData>) -> Self {
-        ParallaxResource {
-            layer_data,
-            layer_entities: vec![],
-            window_size: Vec2::ZERO,
-        }
-    }
-
-    /// Delete all layer entities in parallax resource and empty Vec
-    pub fn despawn_layers(&mut self, commands: &mut Commands) {
-        // Remove all layer entities
-        for entity in self.layer_entities.iter() {
-            commands.entity(*entity).despawn_recursive();
-        }
-
-        // Empty the layer entity vector
-        self.layer_entities = vec![];
-    }
-
+impl CreateParallaxEvent {
     /// Create layers from layer data
     pub fn create_layers(
-        &mut self,
+        &self,
         commands: &mut Commands,
+        window_size: Vec2,
         asset_server: &AssetServer,
         texture_atlases: &mut Assets<TextureAtlas>,
-    ) {
-        // Despawn any existing layers
-        self.despawn_layers(commands);
-
+    ) -> Vec<Entity> {
+        let mut entities = vec![];
         // Spawn new layers using layer_data
-        for (i, layer) in self.layer_data.iter().enumerate() {
+        for (i, layer) in self.layers_data.iter().enumerate() {
             // Setup texture
             let texture_handle = asset_server.load(&layer.path);
             let texture_atlas = TextureAtlas::from_grid(
@@ -90,14 +47,14 @@ impl ParallaxResource {
 
             let y_max_index = match layer.speed {
                 layer::LayerSpeed::Vertical(_) | layer::LayerSpeed::Bidirectional(..) => max(
-                    (self.window_size.y / (layer.tile_size.y * layer.scale) + 1.0) as i32,
+                    (window_size.y / (layer.tile_size.y * layer.scale) + 1.0) as i32,
                     1,
                 ),
                 layer::LayerSpeed::Horizontal(_) => 0,
             };
             let x_max_index = match layer.speed {
                 layer::LayerSpeed::Horizontal(_) | layer::LayerSpeed::Bidirectional(..) => max(
-                    (self.window_size.x / (layer.tile_size.x * layer.scale) + 1.0) as i32,
+                    (window_size.x / (layer.tile_size.x * layer.scale) + 1.0) as i32,
                     1,
                 ),
                 layer::LayerSpeed::Vertical(_) => 0,
@@ -149,11 +106,28 @@ impl ParallaxResource {
             });
 
             // Push parallax layer entity to layer_entities
-            self.layer_entities.push(entity_commands.id());
+            entities.push(entity_commands.id());
         }
+        entities
     }
+}
+
+/// Event used to update parallax
+pub struct ParallaxMoveEvent {
+    /// Speed to move camera
+    pub camera_move_speed: Vec2,
+
+    pub camera: Entity,
 }
 
 /// Attach to a single camera to be used with parallax
 #[derive(Component)]
-pub struct ParallaxCameraComponent;
+pub struct ParallaxCameraComponent {
+    pub entities: Vec<Entity>,
+}
+
+impl Default for ParallaxCameraComponent {
+    fn default() -> Self {
+        Self { entities: vec![] }
+    }
+}
