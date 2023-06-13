@@ -1,7 +1,7 @@
 use std::cmp::max;
 
 use crate::layer;
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 
 /// Event to setup and create parallax
 #[derive(Debug)]
@@ -18,6 +18,7 @@ impl CreateParallaxEvent {
         window_size: Vec2,
         asset_server: &AssetServer,
         texture_atlases: &mut Assets<TextureAtlas>,
+        render_layer: u8,
     ) -> Vec<Entity> {
         let mut entities = vec![];
         // Spawn new layers using layer_data
@@ -68,6 +69,7 @@ impl CreateParallaxEvent {
             let mut entity_commands = commands.spawn_empty();
             entity_commands
                 .insert(Name::new(format!("Parallax Layer ({})", i)))
+                .insert(RenderLayers::from_layers(&[render_layer]))
                 .insert(SpatialBundle {
                     transform: Transform {
                         translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
@@ -84,12 +86,13 @@ impl CreateParallaxEvent {
                                 layer.tile_size.x * j as f32;
                             adjusted_spritesheet_bundle.transform.translation.y =
                                 layer.tile_size.y * k as f32;
-                            parent.spawn(adjusted_spritesheet_bundle).insert(
-                                layer::LayerTextureComponent {
+                            parent
+                                .spawn(adjusted_spritesheet_bundle)
+                                .insert(RenderLayers::from_layers(&[render_layer]))
+                                .insert(layer::LayerTextureComponent {
                                     width: layer.tile_size.x,
                                     height: layer.tile_size.y,
-                                },
-                            );
+                                });
                         }
                     }
                 });
@@ -103,6 +106,7 @@ impl CreateParallaxEvent {
                 },
                 texture_count,
                 transition_factor: layer.transition_factor,
+                camera: self.camera,
             });
 
             // Push parallax layer entity to layer_entities
@@ -123,11 +127,24 @@ pub struct ParallaxMoveEvent {
 /// Attach to a single camera to be used with parallax
 #[derive(Component)]
 pub struct ParallaxCameraComponent {
+    pub render_layer: u8,
     pub entities: Vec<Entity>,
+}
+
+impl ParallaxCameraComponent {
+    pub fn new(render_layer: u8) -> Self {
+        Self {
+            render_layer: render_layer,
+            ..default()
+        }
+    }
 }
 
 impl Default for ParallaxCameraComponent {
     fn default() -> Self {
-        Self { entities: vec![] }
+        Self {
+            render_layer: 0,
+            entities: vec![],
+        }
     }
 }
