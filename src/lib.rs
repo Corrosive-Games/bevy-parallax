@@ -42,8 +42,8 @@ fn follow_camera_system(
     mut layer_query: Query<(&mut Transform, &LayerComponent), Without<ParallaxCameraComponent>>,
     mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
-    if let Some(mut camera_transform) = camera_query.iter_mut().next() {
-        for event in move_events.iter() {
+    for event in move_events.iter() {
+        if let Ok(mut camera_transform) = camera_query.get_mut(event.camera) {
             camera_transform.translation += event.camera_move_speed.extend(0.0);
             for (mut layer_transform, layer) in layer_query.iter_mut() {
                 layer_transform.translation.x += event.camera_move_speed.x * layer.speed.x;

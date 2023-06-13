@@ -7,6 +7,8 @@ use bevy::prelude::*;
 pub struct ParallaxMoveEvent {
     /// Speed to move camera
     pub camera_move_speed: Vec2,
+
+    pub camera: Entity,
 }
 
 /// Resource for managing parallax
