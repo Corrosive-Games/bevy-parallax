@@ -64,6 +64,8 @@ pub struct LayerComponent {
     pub texture_count: Vec2,
     /// Number used to determine when textures are moved to opposite side of camera
     pub transition_factor: f32,
+
+    pub camera: Entity
 }
 
 /// Core component for layer texture
