@@ -12,10 +12,10 @@ keywords = ["bevy", "gamedev", "parallax", "scrolling", "background"]
 exclude = ["assets/*"]
 
 [dependencies]
-serde = "1.0.136"
+serde = "1.0.180"
 
 [dependencies.bevy]
-version = "0.10.0"
+version = "0.11.0"
 default-features = false
 features = [
     "bevy_render",
@@ -31,7 +31,7 @@ features = [
 ron = "0.8.0"
 
 [dev-dependencies.bevy]
-version = "0.10.0"
+version = "0.11.0"
 default-features = false
 features = ["x11", "png"]
 

@@ -23,9 +23,9 @@ fn main() {
                 // Use nearest filtering so our pixel art renders clear
                 .set(ImagePlugin::default_nearest()),
         )
-        .add_plugin(ParallaxPlugin)
-        .add_startup_system(initialize_camera_system)
-        .add_system(move_camera_system.before(ParallaxSystems))
+        .add_plugins(ParallaxPlugin)
+        .add_systems(Startup, initialize_camera_system)
+        .add_systems(Update, move_camera_system.before(ParallaxSystems))
         .run();
 }
 
