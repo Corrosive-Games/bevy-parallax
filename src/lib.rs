@@ -11,8 +11,12 @@ impl Plugin for ParallaxPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<ParallaxMoveEvent>()
             .add_event::<CreateParallaxEvent>()
-            .add_systems((create_parallax_system, follow_camera_system).in_set(ParallaxSystems))
-            .add_system(
+            .add_systems(
+                Update,
+                (create_parallax_system, follow_camera_system).in_set(ParallaxSystems),
+            )
+            .add_systems(
+                Update,
                 update_layer_textures_system
                     .in_set(ParallaxSystems)
                     .after(follow_camera_system),
