@@ -4,7 +4,7 @@ use crate::layer;
 use bevy::{prelude::*, render::view::RenderLayers};
 
 /// Event to setup and create parallax
-#[derive(Debug)]
+#[derive(Debug, Event)]
 pub struct CreateParallaxEvent {
     pub layers_data: Vec<layer::LayerData>,
     pub camera: Entity,
@@ -121,6 +121,7 @@ impl CreateParallaxEvent {
 }
 
 /// Event used to update parallax
+#[derive(Event)]
 pub struct ParallaxMoveEvent {
     /// Speed to move camera
     pub camera_move_speed: Vec2,
