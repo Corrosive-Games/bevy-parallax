@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_parallax::{
-    CreateParallaxEvent, LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent,
-    ParallaxPlugin, ParallaxSystems,
+    CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, ParallaxCameraComponent,
+    ParallaxMoveEvent, ParallaxPlugin, ParallaxSystems, RepeatStrategy,
 };
 
 fn main() {
@@ -26,6 +26,7 @@ fn main() {
         .add_plugins(ParallaxPlugin)
         .add_systems(Startup, initialize_camera_system)
         .add_systems(Update, move_camera_system.before(ParallaxSystems))
+        .insert_resource(ClearColor(Color::rgb_u8(42, 0, 63)))
         .run();
 }
 
@@ -41,7 +42,8 @@ pub fn initialize_camera_system(
     create_parallax.send(CreateParallaxEvent {
         layers_data: vec![
             LayerData {
-                speed: LayerSpeed::Horizontal(0.9),
+                speed: LayerSpeed::Bidirectional(0.9, 0.9),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::Mirror),
                 path: "cyberpunk_back.png".to_string(),
                 tile_size: Vec2::new(96.0, 160.0),
                 cols: 1,
@@ -51,7 +53,8 @@ pub fn initialize_camera_system(
                 ..Default::default()
             },
             LayerData {
-                speed: LayerSpeed::Horizontal(0.6),
+                speed: LayerSpeed::Bidirectional(0.6, 0.6),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_middle.png".to_string(),
                 tile_size: Vec2::new(144.0, 160.0),
                 cols: 1,
@@ -61,7 +64,8 @@ pub fn initialize_camera_system(
                 ..Default::default()
             },
             LayerData {
-                speed: LayerSpeed::Horizontal(0.1),
+                speed: LayerSpeed::Bidirectional(0.1, 0.1),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::Mirror),
                 path: "cyberpunk_front.png".to_string(),
                 tile_size: Vec2::new(272.0, 160.0),
                 cols: 1,
@@ -82,15 +86,21 @@ pub fn move_camera_system(
     camera_query: Query<Entity, With<Camera>>,
 ) {
     let camera = camera_query.get_single().unwrap();
+    let mut speed = Vec2::ZERO;
     if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
-        move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(3.0, 0.0),
-            camera: camera,
-        });
-    } else if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
-        move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(-3.0, 0.0),
-            camera: camera,
-        });
+        speed += Vec2::new(3.0, 0.0);
     }
+    if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
+        speed += Vec2::new(-3.0, 0.0);
+    }
+    if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
+        speed += Vec2::new(0.0, 3.0);
+    }
+    if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
+        speed += Vec2::new(0.0, -3.0);
+    }
+    move_event_writer.send(ParallaxMoveEvent {
+        camera_move_speed: speed,
+        camera: camera,
+    });
 }

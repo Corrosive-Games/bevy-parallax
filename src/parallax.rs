@@ -50,23 +50,25 @@ impl CreateParallaxEvent {
             // plus as much as it would take to fill the rest of the window space in both directions. Same logic
             // applies to vertical placement.
 
-            let y_max_index = match layer.speed {
-                layer::LayerSpeed::Vertical(_) | layer::LayerSpeed::Bidirectional(..) => max(
-                    (window_size.y / (layer.tile_size.y * layer.scale) + 1.0) as i32,
+            let y_max_index = match layer.repeat.has_vertical() {
+                true => max(
+                    (window_size.y / (layer.tile_size.y * layer.scale) + 2.0) as i32,
                     1,
                 ),
-                layer::LayerSpeed::Horizontal(_) => 0,
+                false => 0,
             };
-            let x_max_index = match layer.speed {
-                layer::LayerSpeed::Horizontal(_) | layer::LayerSpeed::Bidirectional(..) => max(
-                    (window_size.x / (layer.tile_size.x * layer.scale) + 1.0) as i32,
+
+            let x_max_index = match layer.repeat.has_horizontal() {
+                true => max(
+                    (window_size.x / (layer.tile_size.x * layer.scale) + 2.0) as i32,
                     1,
                 ),
-                layer::LayerSpeed::Vertical(_) => 0,
+                false => 0,
             };
+
             let texture_count = Vec2::new(
-                2.0 * x_max_index as f32 + 1.0,
-                2.0 * y_max_index as f32 + 1.0,
+                2.0 * x_max_index as f32,
+                2.0 * y_max_index as f32
             );
 
             // Spawn parallax layer entity
@@ -86,6 +88,18 @@ impl CreateParallaxEvent {
                     for j in -x_max_index..=x_max_index {
                         for k in -y_max_index..=y_max_index {
                             let mut adjusted_spritesheet_bundle = spritesheet_bundle.clone();
+                            if j != 0 {
+                                adjusted_spritesheet_bundle = layer
+                                    .repeat
+                                    .get_horizontal_strategy()
+                                    .transform(adjusted_spritesheet_bundle, (j, k))
+                            }
+                            if k != 0 {
+                                adjusted_spritesheet_bundle = layer
+                                    .repeat
+                                    .get_vertical_strategy()
+                                    .transform(adjusted_spritesheet_bundle, (j, k))
+                            }
                             adjusted_spritesheet_bundle.transform.translation.x =
                                 layer.tile_size.x * j as f32;
                             adjusted_spritesheet_bundle.transform.translation.y =
@@ -108,6 +122,7 @@ impl CreateParallaxEvent {
                     layer::LayerSpeed::Vertical(vy) => Vec2::new(0.0, vy),
                     layer::LayerSpeed::Bidirectional(vx, vy) => Vec2::new(vx, vy),
                 },
+                repeat: layer.repeat.clone(),
                 texture_count,
                 transition_factor: layer.transition_factor,
                 camera: self.camera,
