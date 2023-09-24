@@ -110,8 +110,6 @@ pub struct LayerData {
     pub z: f32,
     /// Default initial position of the Entity container
     pub position: Vec2,
-    /// Number used to determine when textures are moved to opposite side of camera
-    pub transition_factor: f32,
 
     pub color: Color,
 }
@@ -128,7 +126,6 @@ impl Default for LayerData {
             scale: 1.0,
             z: 0.0,
             position: Vec2::ZERO,
-            transition_factor: 1.2,
             color: Color::WHITE,
         }
     }
@@ -143,8 +140,6 @@ pub struct LayerComponent {
     pub repeat: LayerRepeat,
     /// Number of rows (x) and columns (y) with the textures in the layer
     pub texture_count: Vec2,
-    /// Number used to determine when textures are moved to opposite side of camera
-    pub transition_factor: f32,
 
     pub camera: Entity,
 }

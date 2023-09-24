@@ -1,5 +1,3 @@
-use std::cmp::max;
-
 use crate::layer;
 use bevy::{prelude::*, render::view::RenderLayers};
 
@@ -40,36 +38,44 @@ impl CreateParallaxEvent {
                     color: layer.color,
                     ..default()
                 },
-                ..Default::default()
+                ..default()
             };
 
             // Spawn a grid of textures, so that they convincingly wrap around the screen when scrolling.
-            // For unidirectional layers, only spawn a single row or column in direction of their movement.
+            // For no repeat layers, only spawn a single row or column in direction of their movement.
 
             // In every row of the grid, our goal is to have a central texture and at least two that surround it,
-            // plus as much as it would take to fill the rest of the window space in both directions. Same logic
-            // applies to vertical placement.
+            // plus as much as it would take to fill the rest of the window space in both directions.
+            // The grid should have a pair number so the mirror repeat can work correctly
+            // Same logic applies to vertical placement.
+
+            let max_length = window_size.length();
 
             let y_max_index = match layer.repeat.has_vertical() {
-                true => max(
-                    (window_size.y / (layer.tile_size.y * layer.scale) + 2.0) as i32,
-                    1,
-                ),
+                true => f32::ceil(max_length / (layer.tile_size.y * layer.scale)) as i32,
                 false => 0,
             };
 
             let x_max_index = match layer.repeat.has_horizontal() {
-                true => max(
-                    (window_size.x / (layer.tile_size.x * layer.scale) + 2.0) as i32,
-                    1,
-                ),
+                true => f32::ceil(max_length / (layer.tile_size.x * layer.scale)) as i32,
                 false => 0,
             };
 
             let texture_count = Vec2::new(
-                2.0 * x_max_index as f32,
-                2.0 * y_max_index as f32
+                f32::max(2.0 * x_max_index as f32, 1.),
+                f32::max(2.0 * y_max_index as f32, 1.),
             );
+
+            let x_range = if layer.repeat.has_horizontal() {
+                (-x_max_index + 1)..=x_max_index
+            } else {
+                0..=0
+            };
+            let y_range = if layer.repeat.has_vertical() {
+                (-y_max_index + 1)..=y_max_index
+            } else {
+                0..=0
+            };
 
             // Spawn parallax layer entity
             let mut entity_commands = commands.spawn_empty();
@@ -85,25 +91,25 @@ impl CreateParallaxEvent {
                     ..default()
                 })
                 .with_children(|parent| {
-                    for j in -x_max_index..=x_max_index {
-                        for k in -y_max_index..=y_max_index {
+                    for x in x_range {
+                        for y in y_range.clone() {
                             let mut adjusted_spritesheet_bundle = spritesheet_bundle.clone();
-                            if j != 0 {
+                            if x != 0 {
                                 adjusted_spritesheet_bundle = layer
                                     .repeat
                                     .get_horizontal_strategy()
-                                    .transform(adjusted_spritesheet_bundle, (j, k))
+                                    .transform(adjusted_spritesheet_bundle, (x, y))
                             }
-                            if k != 0 {
+                            if y != 0 {
                                 adjusted_spritesheet_bundle = layer
                                     .repeat
                                     .get_vertical_strategy()
-                                    .transform(adjusted_spritesheet_bundle, (j, k))
+                                    .transform(adjusted_spritesheet_bundle, (x, y))
                             }
                             adjusted_spritesheet_bundle.transform.translation.x =
-                                layer.tile_size.x * j as f32;
+                                layer.tile_size.x * x as f32;
                             adjusted_spritesheet_bundle.transform.translation.y =
-                                layer.tile_size.y * k as f32;
+                                layer.tile_size.y * y as f32;
                             parent
                                 .spawn(adjusted_spritesheet_bundle)
                                 .insert(RenderLayers::from_layers(&[render_layer]))
@@ -124,7 +130,6 @@ impl CreateParallaxEvent {
                 },
                 repeat: layer.repeat.clone(),
                 texture_count,
-                transition_factor: layer.transition_factor,
                 camera: self.camera,
             });
 
@@ -136,12 +141,34 @@ impl CreateParallaxEvent {
 }
 
 /// Event used to update parallax
-#[derive(Event)]
+#[derive(Event, Debug)]
 pub struct ParallaxMoveEvent {
     /// Speed to move camera
     pub camera_move_speed: Vec2,
 
     pub camera: Entity,
+}
+
+impl ParallaxMoveEvent {
+    pub fn has_movement(&self) -> bool {
+        self.camera_move_speed != Vec2::ZERO
+    }
+
+    pub fn has_right_movement(&self) -> bool {
+        self.camera_move_speed.x > 0.
+    }
+
+    pub fn has_left_movement(&self) -> bool {
+        self.camera_move_speed.x < 0.
+    }
+
+    pub fn has_up_movement(&self) -> bool {
+        self.camera_move_speed.y > 0.
+    }
+
+    pub fn has_down_movement(&self) -> bool {
+        self.camera_move_speed.y < 0.
+    }
 }
 
 /// Attach to a single camera to be used with parallax
@@ -166,5 +193,92 @@ impl Default for ParallaxCameraComponent {
             render_layer: 0,
             entities: vec![],
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use bevy::prelude::*;
+
+    use crate::ParallaxMoveEvent;
+
+    #[test]
+    fn test_check() {
+        assert_eq!(true, true);
+    }
+
+    #[test]
+    fn test_parallax_event() {
+        let camera = Entity::from_raw(0);
+
+        let no_movement = ParallaxMoveEvent {
+            camera_move_speed: Vec2::ZERO,
+            camera: camera,
+        };
+        assert_eq!(no_movement.has_movement(), false);
+        assert_eq!(no_movement.has_up_movement(), false);
+        assert_eq!(no_movement.has_down_movement(), false);
+        assert_eq!(no_movement.has_left_movement(), false);
+        assert_eq!(no_movement.has_right_movement(), false);
+
+        let up = ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(0., 1.),
+            camera: camera,
+        };
+        assert_eq!(up.has_movement(), true);
+        assert_eq!(up.has_up_movement(), true);
+        assert_eq!(up.has_down_movement(), false);
+        assert_eq!(up.has_left_movement(), false);
+        assert_eq!(up.has_right_movement(), false);
+
+        let down = ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(0., -1.),
+            camera: camera,
+        };
+        assert_eq!(down.has_movement(), true);
+        assert_eq!(down.has_up_movement(), false);
+        assert_eq!(down.has_down_movement(), true);
+        assert_eq!(down.has_left_movement(), false);
+        assert_eq!(down.has_right_movement(), false);
+
+        let left = ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(-1., 0.),
+            camera: camera,
+        };
+        assert_eq!(left.has_movement(), true);
+        assert_eq!(left.has_up_movement(), false);
+        assert_eq!(left.has_down_movement(), false);
+        assert_eq!(left.has_left_movement(), true);
+        assert_eq!(left.has_right_movement(), false);
+
+        let right = ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(1., 0.),
+            camera: camera,
+        };
+        assert_eq!(right.has_movement(), true);
+        assert_eq!(right.has_up_movement(), false);
+        assert_eq!(right.has_down_movement(), false);
+        assert_eq!(right.has_left_movement(), false);
+        assert_eq!(right.has_right_movement(), true);
+
+        let left_down = ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(-1., -1.),
+            camera: camera,
+        };
+        assert_eq!(left_down.has_movement(), true);
+        assert_eq!(left_down.has_up_movement(), false);
+        assert_eq!(left_down.has_down_movement(), true);
+        assert_eq!(left_down.has_left_movement(), true);
+        assert_eq!(left_down.has_right_movement(), false);
+
+        let up_right = ParallaxMoveEvent {
+            camera_move_speed: Vec2::new(1., 1.),
+            camera: camera,
+        };
+        assert_eq!(up_right.has_movement(), true);
+        assert_eq!(up_right.has_up_movement(), true);
+        assert_eq!(up_right.has_down_movement(), false);
+        assert_eq!(up_right.has_left_movement(), false);
+        assert_eq!(up_right.has_right_movement(), true);
     }
 }

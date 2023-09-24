@@ -4,8 +4,8 @@ use bevy::{
     render::{camera::Viewport, view::RenderLayers},
 };
 use bevy_parallax::{
-    CreateParallaxEvent, LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent,
-    ParallaxPlugin, ParallaxSystems,
+    CreateParallaxEvent, LayerData, LayerSpeed, LayerRepeat, ParallaxCameraComponent, ParallaxMoveEvent,
+    ParallaxPlugin, ParallaxSystems, RepeatStrategy,
 };
 
 fn main() {
@@ -82,6 +82,7 @@ pub fn initialize_camera_system(
         layers_data: vec![
             LayerData {
                 speed: LayerSpeed::Horizontal(0.9),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_back.png".to_string(),
                 tile_size: Vec2::new(96.0, 160.0),
                 cols: 1,
@@ -92,6 +93,7 @@ pub fn initialize_camera_system(
             },
             LayerData {
                 speed: LayerSpeed::Horizontal(0.6),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_middle.png".to_string(),
                 tile_size: Vec2::new(144.0, 160.0),
                 cols: 1,
@@ -102,6 +104,7 @@ pub fn initialize_camera_system(
             },
             LayerData {
                 speed: LayerSpeed::Horizontal(0.1),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_front.png".to_string(),
                 tile_size: Vec2::new(272.0, 160.0),
                 cols: 1,
