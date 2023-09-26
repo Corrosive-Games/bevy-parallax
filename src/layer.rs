@@ -203,7 +203,7 @@ impl Default for LayerData {
 pub struct LayerComponent {
     /// Relative speed of layer to the camera movement
     pub speed: Vec2,
-    ///
+    /// 
     pub repeat: LayerRepeat,
     /// Number of rows (x) and columns (y) with the textures in the layer
     pub texture_count: Vec2,

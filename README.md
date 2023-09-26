@@ -19,7 +19,7 @@ fn main() {
         title: "Window Name".to_string(),
         resolution: (1280.0, 720.0).into(),
         resizable: false,
-        ..Default::default()
+        ..default()
     };
 
     App::new()
@@ -33,7 +33,7 @@ fn main() {
                     rows: 1,
                     scale: 4.5,
                     z: 0.0,
-                    ..Default::default()
+                    ..default()
                 },
                 LayerData {
                     speed: LayerSpeed::Horizontal(0.6),
@@ -43,7 +43,7 @@ fn main() {
                     rows: 1,
                     scale: 4.5,
                     z: 1.0,
-                    ..Default::default()
+                    ..default()
                 },
                 LayerData {
                     speed: LayerSpeed::Horizontal(0.1),
@@ -53,10 +53,10 @@ fn main() {
                     rows: 1,
                     scale: 4.5,
                     z: 2.0,
-                    ..Default::default()
+                    ..default()
                 },
             ],
-            ..Default::default()
+            ..default()
         })
         .add_plugins(
             DefaultPlugins

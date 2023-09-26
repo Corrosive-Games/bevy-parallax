@@ -124,31 +124,34 @@ impl CreateParallaxEvent {
 /// Event used to update parallax
 #[derive(Event, Debug)]
 pub struct ParallaxMoveEvent {
-    /// Speed to move camera
-    pub camera_move_speed: Vec2,
+    /// camera translation
+    pub translation: Vec2,
+
+    /// camera rotation
+    pub rotation: f32,
 
     pub camera: Entity,
 }
 
 impl ParallaxMoveEvent {
-    pub fn has_movement(&self) -> bool {
-        self.camera_move_speed != Vec2::ZERO
+    pub fn has_translation(&self) -> bool {
+        self.translation != Vec2::ZERO
     }
 
-    pub fn has_right_movement(&self) -> bool {
-        self.camera_move_speed.x > 0.
+    pub fn has_right_translation(&self) -> bool {
+        self.translation.x > 0.
     }
 
-    pub fn has_left_movement(&self) -> bool {
-        self.camera_move_speed.x < 0.
+    pub fn has_left_translation(&self) -> bool {
+        self.translation.x < 0.
     }
 
-    pub fn has_up_movement(&self) -> bool {
-        self.camera_move_speed.y > 0.
+    pub fn has_up_translation(&self) -> bool {
+        self.translation.y > 0.
     }
 
-    pub fn has_down_movement(&self) -> bool {
-        self.camera_move_speed.y < 0.
+    pub fn has_down_translation(&self) -> bool {
+        self.translation.y < 0.
     }
 }
 
@@ -189,73 +192,80 @@ mod tests {
         let camera = Entity::from_raw(0);
 
         let no_movement = ParallaxMoveEvent {
-            camera_move_speed: Vec2::ZERO,
+            translation: Vec2::ZERO,
+            rotation: 0.,
             camera: camera,
         };
-        assert_eq!(no_movement.has_movement(), false);
-        assert_eq!(no_movement.has_up_movement(), false);
-        assert_eq!(no_movement.has_down_movement(), false);
-        assert_eq!(no_movement.has_left_movement(), false);
-        assert_eq!(no_movement.has_right_movement(), false);
+        assert_eq!(no_movement.has_translation(), false);
+        assert_eq!(no_movement.has_up_translation(), false);
+        assert_eq!(no_movement.has_down_translation(), false);
+        assert_eq!(no_movement.has_left_translation(), false);
+        assert_eq!(no_movement.has_right_translation(), false);
 
         let up = ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(0., 1.),
+            translation: Vec2::new(0., 1.),
+            rotation: 0.,
             camera: camera,
         };
-        assert_eq!(up.has_movement(), true);
-        assert_eq!(up.has_up_movement(), true);
-        assert_eq!(up.has_down_movement(), false);
-        assert_eq!(up.has_left_movement(), false);
-        assert_eq!(up.has_right_movement(), false);
+        assert_eq!(up.has_translation(), true);
+        assert_eq!(up.has_up_translation(), true);
+        assert_eq!(up.has_down_translation(), false);
+        assert_eq!(up.has_left_translation(), false);
+        assert_eq!(up.has_right_translation(), false);
 
         let down = ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(0., -1.),
+            translation: Vec2::new(0., -1.),
+            rotation: 0.,
             camera: camera,
         };
-        assert_eq!(down.has_movement(), true);
-        assert_eq!(down.has_up_movement(), false);
-        assert_eq!(down.has_down_movement(), true);
-        assert_eq!(down.has_left_movement(), false);
-        assert_eq!(down.has_right_movement(), false);
+        assert_eq!(down.has_translation(), true);
+        assert_eq!(down.has_up_translation(), false);
+        assert_eq!(down.has_down_translation(), true);
+        assert_eq!(down.has_left_translation(), false);
+        assert_eq!(down.has_right_translation(), false);
 
         let left = ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(-1., 0.),
+            translation: Vec2::new(-1., 0.),
+            rotation: 0.,
             camera: camera,
         };
-        assert_eq!(left.has_movement(), true);
-        assert_eq!(left.has_up_movement(), false);
-        assert_eq!(left.has_down_movement(), false);
-        assert_eq!(left.has_left_movement(), true);
-        assert_eq!(left.has_right_movement(), false);
+        assert_eq!(left.has_translation(), true);
+        assert_eq!(left.has_up_translation(), false);
+        assert_eq!(left.has_down_translation(), false);
+        assert_eq!(left.has_left_translation(), true);
+        assert_eq!(left.has_right_translation(), false);
 
         let right = ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(1., 0.),
+            translation: Vec2::new(1., 0.),
+            rotation: 0.,
             camera: camera,
         };
-        assert_eq!(right.has_movement(), true);
-        assert_eq!(right.has_up_movement(), false);
-        assert_eq!(right.has_down_movement(), false);
-        assert_eq!(right.has_left_movement(), false);
-        assert_eq!(right.has_right_movement(), true);
+        assert_eq!(right.has_translation(), true);
+        assert_eq!(right.has_up_translation(), false);
+        assert_eq!(right.has_down_translation(), false);
+        assert_eq!(right.has_left_translation(), false);
+        assert_eq!(right.has_right_translation(), true);
 
         let left_down = ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(-1., -1.),
+            translation: Vec2::new(-1., -1.),
+            rotation: 0.,
             camera: camera,
         };
-        assert_eq!(left_down.has_movement(), true);
-        assert_eq!(left_down.has_up_movement(), false);
-        assert_eq!(left_down.has_down_movement(), true);
-        assert_eq!(left_down.has_left_movement(), true);
-        assert_eq!(left_down.has_right_movement(), false);
+        assert_eq!(left_down.has_translation(), true);
+        assert_eq!(left_down.has_up_translation(), false);
+        assert_eq!(left_down.has_down_translation(), true);
+        assert_eq!(left_down.has_left_translation(), true);
+        assert_eq!(left_down.has_right_translation(), false);
 
         let up_right = ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(1., 1.),
+            translation: Vec2::new(1., 1.),
+            rotation: 0.,
             camera: camera,
         };
-        assert_eq!(up_right.has_movement(), true);
-        assert_eq!(up_right.has_up_movement(), true);
-        assert_eq!(up_right.has_down_movement(), false);
-        assert_eq!(up_right.has_left_movement(), false);
-        assert_eq!(up_right.has_right_movement(), true);
+        assert_eq!(up_right.has_translation(), true);
+        assert_eq!(up_right.has_up_translation(), true);
+        assert_eq!(up_right.has_down_translation(), false);
+        assert_eq!(up_right.has_left_translation(), false);
+        assert_eq!(up_right.has_right_translation(), true);
     }
 }

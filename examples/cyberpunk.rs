@@ -1,9 +1,24 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_parallax::{
-    CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, ParallaxCameraComponent,
-    ParallaxMoveEvent, ParallaxPlugin, ParallaxSystems, RepeatStrategy,
+    CameraFollow, CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, ParallaxCameraComponent,
+    ParallaxPlugin, ParallaxSystems, RepeatStrategy,
 };
+
+#[derive(Component)]
+pub struct Player {
+    lin_speed: f32,
+    ang_speed: f32,
+}
+
+impl Default for Player {
+    fn default() -> Self {
+        Self {
+            lin_speed: 900.,
+            ang_speed: 3.,
+        }
+    }
+}
 
 fn main() {
     // Define window
@@ -11,7 +26,7 @@ fn main() {
         title: "Cyberpunk".to_string(),
         resolution: (1280.0, 720.0).into(),
         resizable: false,
-        ..Default::default()
+        ..default()
     };
 
     App::new()
@@ -27,9 +42,42 @@ fn main() {
         .add_plugins(ParallaxPlugin)
         .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, initialize_camera_system)
-        .add_systems(Update, move_camera_system.before(ParallaxSystems))
+        .add_systems(Update, move_player_system.before(ParallaxSystems))
         .insert_resource(ClearColor(Color::rgb_u8(42, 0, 63)))
         .run();
+}
+
+pub fn move_player_system(
+    keyboard_input: Res<Input<KeyCode>>,
+    time: Res<Time>,
+    mut player_query: Query<(&mut Transform, &Player)>,
+) {
+    let mut rotation: f32 = 0.;
+    let mut direction = Vec2::ZERO;
+    for (mut player_transform, player) in player_query.iter_mut() {
+        if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
+            direction += Vec2::new(1., 0.);
+        }
+        if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
+            direction += Vec2::new(-1., 0.)
+        }
+        if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
+            direction += Vec2::new(0., 1.);
+        }
+        if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
+            direction += Vec2::new(0., -1.)
+        }
+        if keyboard_input.pressed(KeyCode::E) {
+            rotation -= 1.;
+        }
+        if keyboard_input.pressed(KeyCode::Q) {
+            rotation += 1.;
+        }
+        direction = direction.normalize_or_zero() * player.lin_speed * time.delta_seconds();
+        rotation = rotation * player.ang_speed * time.delta_seconds();
+        player_transform.translation += direction.extend(0.);
+        player_transform.rotate_z(rotation);
+    }
 }
 
 // Put a ParallaxCameraComponent on the camera used for parallax
@@ -37,8 +85,23 @@ pub fn initialize_camera_system(
     mut commands: Commands,
     mut create_parallax: EventWriter<CreateParallaxEvent>,
 ) {
+    let player = commands
+        .spawn((
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::YELLOW,
+                    custom_size: Some(Vec2::new(50.0, 50.0)),
+                    ..default()
+                },
+                transform: Transform::from_translation(Vec2::ZERO.extend(3.)),
+                ..default()
+            },
+            Player::default(),
+        ))
+        .id();
     let camera = commands
         .spawn(Camera2dBundle::default())
+        .insert(CameraFollow::fixed(player))
         .insert(ParallaxCameraComponent::default())
         .id();
     create_parallax.send(CreateParallaxEvent {
@@ -87,39 +150,6 @@ pub fn initialize_camera_system(
                 ..default()
             },
         ],
-        camera,
-    });
-}
-
-// Send a ParallaxMoveEvent with the desired camera movement speed
-pub fn move_camera_system(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut move_event_writer: EventWriter<ParallaxMoveEvent>,
-    mut camera_query: Query<(Entity, &mut Transform), With<Camera>>,
-) {
-    let (camera, mut camera_transform) = camera_query.get_single_mut().unwrap();
-    let speed = 9.;
-    let mut direction = Vec2::ZERO;
-    if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
-        direction += Vec2::new(1.0, 0.0);
-    }
-    if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
-        direction += Vec2::new(-1.0, 0.0);
-    }
-    if keyboard_input.pressed(KeyCode::KeyW) || keyboard_input.pressed(KeyCode::ArrowUp) {
-        direction += Vec2::new(0.0, 1.0);
-    }
-    if keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown) {
-        direction += Vec2::new(0.0, -1.0);
-    }
-    if keyboard_input.pressed(KeyCode::KeyE) {
-        camera_transform.rotate_z(0.1);
-    }
-    if keyboard_input.pressed(KeyCode::KeyQ) {
-        camera_transform.rotate_z(-0.1);
-    }
-    move_event_writer.send(ParallaxMoveEvent {
-        camera_move_speed: direction.normalize_or_zero() * speed,
         camera: camera,
     });
 }
