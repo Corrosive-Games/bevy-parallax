@@ -7,7 +7,6 @@
 		rows: 1,
 		scale: 1.25,
 		z: 0.0,
-		transition_factor: 1.2,
 		color: Rgba(
 			red: 0.5,
 	        green: 0.8,
@@ -23,7 +22,6 @@
 		rows: 1,
 		scale: 1.25,
 		z: 1.0,
-		transition_factor: 1.2,
 		color: Rgba(
 			red: 0.5,
 	        green: 0.8,
@@ -39,7 +37,6 @@
 		rows: 1,
 		scale: 1.25,
 		z: 2.0,
-		transition_factor: 1.2,
 		color: Rgba(
 			red: 0.7,
 	        green: 0.6,
@@ -55,7 +52,6 @@
 		rows: 1,
 		scale: 1.25,
 		z: 3.0,
-		transition_factor: 1.2,
 		color: Rgba(
 			red: 0.7,
 	        green: 0.6,
@@ -71,7 +67,6 @@
 		rows: 1,
 		scale: 1.25,
 		z: 4.0,
-		transition_factor: 1.2,
 		color: Rgba(
 			red: 0.7,
 	        green: 0.6,
@@ -87,7 +82,6 @@
 		rows: 1,
 		scale: 1.25,
 		z: 5.0,
-		transition_factor: 1.2,
 		color: Rgba(
 			red: 0.7,
 	        green: 0.6,

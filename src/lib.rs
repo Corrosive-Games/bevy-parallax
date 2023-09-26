@@ -85,57 +85,73 @@ fn follow_camera_system(
 fn update_layer_textures_system(
     layer_query: Query<(&LayerComponent, &Children)>,
     mut texture_query: Query<
-        (&GlobalTransform, &mut Transform, &LayerTextureComponent),
+        (
+            &GlobalTransform,
+            &mut Transform,
+            &LayerTextureComponent,
+            &ComputedVisibility,
+        ),
         Without<ParallaxCameraComponent>,
     >,
     camera_query: Query<(Entity, &Transform, &Camera), With<ParallaxCameraComponent>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
+    mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
-    let primary_window = window_query.get_single().unwrap();
-    let window_size = Vec2::new(primary_window.width(), primary_window.height());
-    for (camera_entity, camera_transform, camera) in camera_query.iter() {
-        let view_size = match &camera.viewport {
-            Some(viewport) => viewport.physical_size.as_vec2(),
-            _ => window_size,
-        };
-        for (layer, children) in layer_query.iter() {
-            if layer.camera != camera_entity {
-                continue;
-            }
-            for &child in children.iter() {
-                let (texture_gtransform, mut texture_transform, layer_texture) =
-                    texture_query.get_mut(child).unwrap();
-
-                let texture_gtransform = texture_gtransform.compute_transform();
-
-                // Move right-most texture to left side of layer when camera is approaching left-most end
-                if camera_transform.translation.x - texture_gtransform.translation.x
-                    + ((layer_texture.width * texture_gtransform.scale.x) / 2.0)
-                    < -(view_size.x * layer.transition_factor)
-                {
-                    texture_transform.translation.x -= layer_texture.width * layer.texture_count.x;
-                // Move left-most texture to right side of layer when camera is approaching right-most end
-                } else if camera_transform.translation.x
-                    - texture_gtransform.translation.x
-                    - ((layer_texture.width * texture_gtransform.scale.x) / 2.0)
-                    > view_size.x * layer.transition_factor
-                {
-                    texture_transform.translation.x += layer_texture.width * layer.texture_count.x;
+    for event in move_events.iter() {
+        if !event.has_movement() {
+            continue;
+        }
+        let primary_window = window_query.get_single().unwrap();
+        let window_size = Vec2::new(primary_window.width(), primary_window.height());
+        if let Ok((camera_entity, camera_transform, camera)) = camera_query.get(event.camera) {
+            let view_size = match &camera.viewport {
+                Some(viewport) => viewport.physical_size.as_vec2(),
+                _ => window_size,
+            };
+            for (layer, children) in layer_query.iter() {
+                if layer.camera != camera_entity {
+                    continue;
                 }
-
-                // Move the top texture to the bottom of the layer when the camera is approaching the bottom
-                if camera_transform.translation.y - texture_gtransform.translation.y
-                    + ((layer_texture.height * texture_gtransform.scale.y) / 2.0)
-                    < -(view_size.y * layer.transition_factor)
-                {
-                    texture_transform.translation.y -= layer_texture.height * layer.texture_count.y;
-                // Move the bottom texture to the top of the layer when the camera is approaching the top
-                } else if camera_transform.translation.y
-                    - texture_gtransform.translation.y
-                    - ((layer_texture.height * texture_gtransform.scale.y) / 2.0)
-                    > view_size.y * layer.transition_factor
-                {
-                    texture_transform.translation.y += layer_texture.height * layer.texture_count.y;
+                for &child in children.iter() {
+                    let (
+                        texture_gtransform,
+                        mut texture_transform,
+                        layer_texture,
+                        computed_visibility,
+                    ) = texture_query.get_mut(child).unwrap();
+                    // Do not move visible textures
+                    if computed_visibility.is_visible() {
+                        continue;
+                    }
+                    let texture_gtransform = texture_gtransform.compute_transform();
+                    let texture_translation =
+                        camera_transform.translation - texture_gtransform.translation;
+                    if layer.repeat.has_horizontal() {
+                        let x_delta = layer_texture.width * layer.texture_count.x;
+                        let half_width = layer_texture.width * texture_gtransform.scale.x / 2.0;
+                        // Move not visible right texture to left side of layer when camera is moving to left
+                        if event.has_left_movement() && texture_translation.x + half_width < -view_size.x {
+                            texture_transform.translation.x -= x_delta;
+                        
+                        }
+                        // Move not visible left texture to right side of layer when camera is moving to right
+                        if event.has_right_movement() && texture_translation.x - half_width > view_size.x {
+                            texture_transform.translation.x += x_delta;
+                        }
+                    }
+                    if layer.repeat.has_vertical() {
+                        let y_delta = layer_texture.height * layer.texture_count.y;
+                        let half_height = layer_texture.height * texture_gtransform.scale.y / 2.0;
+                        // Move not visible top texture to the bottom of the layer when the camera is moving to the bottom
+                        if event.has_down_movement() && texture_translation.y + half_height < -view_size.y {
+                            texture_transform.translation.y -= y_delta;
+                        
+                        }
+                        // Move not visible bottom texture to the top of the layer when the camera is moving to the top
+                        if event.has_up_movement() && texture_translation.y - half_height > view_size.y {
+                            texture_transform.translation.y += y_delta;
+                        }
+                    }
                 }
             }
         }

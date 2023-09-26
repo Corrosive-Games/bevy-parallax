@@ -25,8 +25,7 @@ features = [
 ]
 
 [dev-dependencies]
-# Temporarily removed until it updates to Bevy 0.8
-# bevy-inspector-egui = "0.11.0"
+bevy-inspector-egui = "0.19.0"
 ron = "0.8.0"
 
 [dev-dependencies.bevy]
