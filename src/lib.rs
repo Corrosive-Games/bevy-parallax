@@ -162,3 +162,15 @@ fn update_layer_textures_system(
         }
     }
 }
+
+
+#[cfg(doctest)]
+mod test_readme {
+  macro_rules! external_doc_test {
+    ($x:expr) => {
+        #[doc = $x]
+        extern {}
+    };
+  }
+  external_doc_test!(include_str!("../README.md"));
+}
