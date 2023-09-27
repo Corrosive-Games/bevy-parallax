@@ -1,8 +1,9 @@
 use bevy::prelude::*;
+#[cfg(feature = "bevy-inspector-egui")]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_parallax::{
-    CameraFollow, CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, ParallaxCameraComponent,
-    ParallaxPlugin, ParallaxSystems, RepeatStrategy,
+    CameraFollow, CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, Limit, ParallaxCameraComponent, ParallaxPlugin, ParallaxSystems,
+    RepeatStrategy, PID, Vec2Limit,
 };
 
 #[derive(Component)]
@@ -29,29 +30,26 @@ fn main() {
         ..default()
     };
 
-    App::new()
-        .add_plugins(
-            DefaultPlugins
-                .set(WindowPlugin {
-                    primary_window: Some(primary_window),
-                    ..default()
-                })
-                // Use nearest filtering so our pixel art renders clear
-                .set(ImagePlugin::default_nearest()),
-        )
-        .add_plugins(ParallaxPlugin)
-        .add_plugins(WorldInspectorPlugin::new())
-        .add_systems(Startup, initialize_camera_system)
-        .add_systems(Update, move_player_system.before(ParallaxSystems))
-        .insert_resource(ClearColor(Color::rgb_u8(42, 0, 63)))
-        .run();
+    let mut app = App::new();
+    app.add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: Some(primary_window),
+                ..default()
+            })
+            // Use nearest filtering so our pixel art renders clear
+            .set(ImagePlugin::default_nearest()),
+    )
+    .add_plugins(ParallaxPlugin)
+    .add_systems(Startup, initialize_camera_system)
+    .add_systems(Update, move_player_system.before(ParallaxSystems))
+    .insert_resource(ClearColor(Color::rgb_u8(42, 0, 63)));
+    #[cfg(feature = "bevy-inspector-egui")]
+    app.add_plugins(WorldInspectorPlugin::new());
+    app.run();
 }
 
-pub fn move_player_system(
-    keyboard_input: Res<Input<KeyCode>>,
-    time: Res<Time>,
-    mut player_query: Query<(&mut Transform, &Player)>,
-) {
+pub fn move_player_system(keyboard_input: Res<Input<KeyCode>>, time: Res<Time>, mut player_query: Query<(&mut Transform, &Player)>) {
     let mut rotation: f32 = 0.;
     let mut direction = Vec2::ZERO;
     for (mut player_transform, player) in player_query.iter_mut() {
@@ -81,12 +79,10 @@ pub fn move_player_system(
 }
 
 // Put a ParallaxCameraComponent on the camera used for parallax
-pub fn initialize_camera_system(
-    mut commands: Commands,
-    mut create_parallax: EventWriter<CreateParallaxEvent>,
-) {
+pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: EventWriter<CreateParallaxEvent>) {
     let player = commands
         .spawn((
+            Name::new("Player"),
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::YELLOW,
@@ -99,10 +95,22 @@ pub fn initialize_camera_system(
             Player::default(),
         ))
         .id();
+    let y_limit = Limit::zero_to(500.);
+    let x_pid = PID::new(0.1, 0.5, 0.01);
+    let y_pid = x_pid.with_integral_limit(Limit::new(-25., 25.));
+    let offset = Vec2::new(200., 0.);
     let camera = commands
-        .spawn(Camera2dBundle::default())
-        .insert(CameraFollow::fixed(player))
-        .insert(ParallaxCameraComponent::default())
+        .spawn(Camera2dBundle {
+            transform: Transform::from_translation(offset.extend(0.)),
+            ..default()
+        })
+        //.insert(CameraFollow::fixed(player).with_offset(offset))
+        //.insert(CameraFollow::proportional(player, 0.1).with_offset(offset))
+        .insert(CameraFollow::pid_xyz(player, &x_pid, &y_pid, &x_pid).with_offset(offset))
+        .insert(ParallaxCameraComponent {
+            limits: Vec2Limit::new(Limit::default(), y_limit),
+            ..default()
+        })
         .id();
     create_parallax.send(CreateParallaxEvent {
         layers_data: vec![

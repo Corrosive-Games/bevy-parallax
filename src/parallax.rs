@@ -1,6 +1,9 @@
 use crate::layer;
 use bevy::{prelude::*, render::view::RenderLayers};
 
+#[cfg(feature = "bevy-inspector-egui")]
+use bevy_inspector_egui::prelude::*;
+
 /// Event to setup and create parallax
 #[derive(Event, Debug)]
 pub struct CreateParallaxEvent {
@@ -54,10 +57,7 @@ impl CreateParallaxEvent {
                 false => 0,
             };
 
-            let texture_count = Vec2::new(
-                f32::max(2.0 * x_max_index as f32, 1.),
-                f32::max(2.0 * y_max_index as f32, 1.),
-            );
+            let texture_count = Vec2::new(f32::max(2.0 * x_max_index as f32, 1.), f32::max(2.0 * y_max_index as f32, 1.));
 
             let x_range = if layer.repeat.has_horizontal() {
                 (-x_max_index + 1)..=x_max_index
@@ -157,11 +157,83 @@ impl ParallaxMoveEvent {
 
 /// Attach to a single camera to be used with parallax
 #[derive(Component)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub struct ParallaxCameraComponent {
     pub render_layer: u8,
+    pub entities: Vec<Entity>,
+    pub limits: Vec2Limit,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
+#[cfg_attr(feature = "bevy-inspector-egui", reflect(InspectorOptions))]
+pub struct Limit {
+    pub min: f32,
+    pub max: f32,
+}
+
+impl Default for Limit {
+    fn default() -> Self {
+        Self {
+            min: f32::NEG_INFINITY,
+            max: f32::INFINITY,
+        }
+    }
+}
+
+impl Limit {
+    pub fn new(min: f32, max: f32) -> Self {
+        Self { min: min, max: max }
+    }
+
+    pub fn zero_to_infinity() -> Self {
+        Self {
+            min: 0.,
+            max: f32::INFINITY,
+        }
+    }
+
+    pub fn zero_to(max: f32) -> Self {
+        Self { min: 0., max: max }
+    }
+
+    pub fn fix(&self, value: f32) -> f32 {
+        f32::min(f32::max(value, self.min), self.max)
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
+#[cfg_attr(feature = "bevy-inspector-egui", reflect(InspectorOptions))]
+pub struct Vec2Limit {
+    pub x: Limit,
+    pub y: Limit,
+}
+
+impl Vec2Limit {
+    pub fn new(x: Limit, y: Limit) -> Self {
+        Self { x: x, y: y }
+    }
+
+    pub fn fix(&self, vec: Vec2) -> Vec2 {
+        Vec2::new(self.x.fix(vec.x), self.y.fix(vec.y))
+    }
+}
+
+impl Default for Vec2Limit {
+    fn default() -> Self {
+        Self {
+            x: default(),
+            y: default(),
+        }
+    }
 }
 
 impl ParallaxCameraComponent {
+    pub fn inside_limits(&self, translation: Vec2) -> Vec2 {
+        self.limits.fix(translation)
+    }
+
     pub fn new(render_layer: u8) -> Self {
         Self {
             render_layer: render_layer,
@@ -172,7 +244,11 @@ impl ParallaxCameraComponent {
 
 impl Default for ParallaxCameraComponent {
     fn default() -> Self {
-        Self { render_layer: 0 }
+        Self {
+            render_layer: 0,
+            entities: vec![],
+            limits: default(),
+        }
     }
 }
 

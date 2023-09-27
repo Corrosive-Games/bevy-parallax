@@ -11,6 +11,21 @@ pub use parallax::*;
 pub use sprite::*;
 
 pub struct ParallaxPlugin;
+
+impl ParallaxPlugin {
+    #[cfg(feature = "bevy-inspector-egui")]
+    fn add_features(&self, app: &mut App) {
+        app.register_type::<Limit>()
+            .register_type::<CameraFollow>()
+            .register_type::<LayerComponent>()
+            .register_type::<LayerTextureComponent>()
+            .register_type::<ParallaxCameraComponent>();
+    }
+
+    #[cfg(not(feature = "bevy-inspector-egui"))]
+    fn add_features(&self, _app: &mut App) {}
+}
+
 impl Plugin for ParallaxPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<ParallaxMoveEvent>()
@@ -19,14 +34,11 @@ impl Plugin for ParallaxPlugin {
             .add_systems(Update, sprite_frame_update_system)
             .add_systems(
                 Update,
-                (
-                    camera_follow_system,
-                    move_layers_system,
-                    update_layer_textures_system,
-                )
+                (camera_follow_system, move_layers_system, update_layer_textures_system)
                     .chain()
                     .in_set(ParallaxSystems),
             );
+        self.add_features(app);
     }
 }
 
@@ -69,20 +81,24 @@ fn create_parallax_system(
 
 /// Move camera and background layers
 fn move_layers_system(
-    mut camera_query: Query<&mut Transform, With<ParallaxCameraComponent>>,
+    mut camera_query: Query<(&mut Transform, &ParallaxCameraComponent)>,
     mut layer_query: Query<(&mut Transform, &LayerComponent), Without<ParallaxCameraComponent>>,
     mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
     for event in move_events.read() {
-        if let Ok(mut camera_transform) = camera_query.get_mut(event.camera) {
-            camera_transform.translation += event.translation.extend(0.0);
+        if let Ok((mut camera_transform, parallax)) = camera_query.get_mut(event.camera) {
+            let camera_translation = camera_transform.translation.clone();
+            camera_transform.translation = parallax
+                .inside_limits(camera_transform.translation.truncate() + event.translation)
+                .extend(camera_transform.translation.z);
+            let real_translation = camera_transform.translation - camera_translation;
             camera_transform.rotate_z(event.rotation);
             for (mut layer_transform, layer) in layer_query.iter_mut() {
                 if layer.camera != event.camera {
                     continue;
                 }
-                layer_transform.translation.x += event.translation.x * layer.speed.x;
-                layer_transform.translation.y += event.translation.y * layer.speed.y;
+                layer_transform.translation.x += real_translation.x * layer.speed.x;
+                layer_transform.translation.y += real_translation.y * layer.speed.y;
             }
         }
     }
@@ -120,19 +136,14 @@ fn update_layer_textures_system(
                     continue;
                 }
                 for &child in children.iter() {
-                    let (
-                        texture_gtransform,
-                        mut texture_transform,
-                        layer_texture,
-                        computed_visibility,
-                    ) = texture_query.get_mut(child).unwrap();
+                    let (texture_gtransform, mut texture_transform, layer_texture, computed_visibility) =
+                        texture_query.get_mut(child).unwrap();
                     // Do not move visible textures
                     if computed_visibility.get() {
                         continue;
                     }
                     let texture_gtransform = texture_gtransform.compute_transform();
-                    let texture_translation =
-                        camera_transform.translation - texture_gtransform.translation;
+                    let texture_translation = camera_transform.translation - texture_gtransform.translation;
                     if layer.repeat.has_horizontal() {
                         let x_delta = layer_texture.width * layer.texture_count.x;
                         let half_width = layer_texture.width * texture_gtransform.scale.x / 2.0;
@@ -163,14 +174,13 @@ fn update_layer_textures_system(
     }
 }
 
-
 #[cfg(doctest)]
 mod test_readme {
-  macro_rules! external_doc_test {
-    ($x:expr) => {
-        #[doc = $x]
-        extern {}
-    };
-  }
-  external_doc_test!(include_str!("../README.md"));
+    macro_rules! external_doc_test {
+        ($x:expr) => {
+            #[doc = $x]
+            extern "C" {}
+        };
+    }
+    external_doc_test!(include_str!("../README.md"));
 }
