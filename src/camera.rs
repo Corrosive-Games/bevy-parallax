@@ -325,7 +325,7 @@ impl CameraFollow {
 }
 
 pub fn camera_follow_system(
-    transform_query: Query<&Transform>,
+    transform_query: Query<&GlobalTransform>,
     time: Res<Time>,
     mut query: Query<(Entity, &Transform, &mut CameraFollow)>,
     mut event_writer: EventWriter<ParallaxMoveEvent>,
@@ -333,7 +333,9 @@ pub fn camera_follow_system(
     for (camera, camera_transform, mut follow) in query.iter_mut() {
         if let Ok(target_transform) = transform_query.get(follow.target) {
             let seconds = time.delta_seconds();
-            let target = target_transform.mul_transform(Transform::from_translation(follow.offset.extend(0.)));
+            let target = target_transform
+                .compute_transform()
+                .mul_transform(Transform::from_translation(follow.offset.extend(0.)));
             let camera_movement =
                 follow
                     .translation_strategy
