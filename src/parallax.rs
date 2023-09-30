@@ -118,7 +118,7 @@ impl CreateParallaxEvent {
                                     height: layer.tile_size.y,
                                 });
                             if sprites > 1 {
-                                child_commands.insert(SpriteFrameUpdate::linear_fps(5., sprites));
+                                child_commands.insert(SpriteFrameUpdate::linear_fps(20., sprites));
                             }
                         }
                     }
