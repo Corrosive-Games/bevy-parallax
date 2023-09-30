@@ -1,4 +1,4 @@
-use crate::layer;
+use crate::{layer, SpriteFrameUpdate};
 use bevy::{prelude::*, render::view::RenderLayers};
 
 /// Event to setup and create parallax
@@ -22,6 +22,7 @@ impl CreateParallaxEvent {
         for (i, layer) in self.layers_data.iter().enumerate() {
             // Setup texture
             let texture_handle = asset_server.load(&layer.path);
+            let sprites = layer.cols * layer.rows;
             let texture_atlas = TextureAtlas::from_grid(
                 texture_handle,
                 layer.tile_size,
@@ -109,13 +110,16 @@ impl CreateParallaxEvent {
                                 layer.tile_size.x * x as f32;
                             adjusted_spritesheet_bundle.transform.translation.y =
                                 layer.tile_size.y * y as f32;
-                            parent
-                                .spawn(adjusted_spritesheet_bundle)
+                            let mut child_commands = parent.spawn(adjusted_spritesheet_bundle);
+                            child_commands
                                 .insert(RenderLayers::from_layers(&[render_layer]))
                                 .insert(layer::LayerTextureComponent {
                                     width: layer.tile_size.x,
                                     height: layer.tile_size.y,
                                 });
+                            if sprites > 1 {
+                                child_commands.insert(SpriteFrameUpdate::linear_fps(5., sprites));
+                            }
                         }
                     }
                 });
