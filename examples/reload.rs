@@ -26,7 +26,7 @@ fn main() {
         .add_plugins(ParallaxPlugin)
         .add_systems(Startup, initialize_camera_system)
         .add_systems(Update, move_camera_system.before(ParallaxSystems))
-        .add_systems(Update, reload_system)
+        .add_systems(Update, (reload_system, despawn_all))
         .run();
 }
 
@@ -88,6 +88,18 @@ pub fn reload_system(
     let camera = camera_query.get_single().unwrap();
     if keyboard_input.just_released(KeyCode::R) {
         create_parallax.send(new_create_parallax_event(camera))
+    }
+}
+
+pub fn despawn_all(
+    mut commands: Commands,
+    keyboard_input: Res<Input<KeyCode>>,
+    all_query: Query<Entity, (Without<Camera>, Without<Window>)>,
+) {
+    if keyboard_input.just_released(KeyCode::Q) {
+        for entity in all_query.iter() {
+            commands.entity(entity).despawn();
+        }
     }
 }
 
