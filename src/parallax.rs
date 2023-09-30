@@ -17,8 +17,7 @@ impl CreateParallaxEvent {
         asset_server: &AssetServer,
         texture_atlases: &mut Assets<TextureAtlas>,
         render_layer: u8,
-    ) -> Vec<Entity> {
-        let mut entities = vec![];
+    )  {
         // Spawn new layers using layer_data
         for (i, layer) in self.layers_data.iter().enumerate() {
             // Setup texture
@@ -122,21 +121,19 @@ impl CreateParallaxEvent {
                 });
 
             // Add layer component to entity
-            entity_commands.insert(layer::LayerComponent {
-                speed: match layer.speed {
-                    layer::LayerSpeed::Horizontal(vx) => Vec2::new(vx, 0.0),
-                    layer::LayerSpeed::Vertical(vy) => Vec2::new(0.0, vy),
-                    layer::LayerSpeed::Bidirectional(vx, vy) => Vec2::new(vx, vy),
-                },
-                repeat: layer.repeat.clone(),
-                texture_count,
-                camera: self.camera,
-            });
-
-            // Push parallax layer entity to layer_entities
-            entities.push(entity_commands.id());
-        }
-        entities
+            entity_commands
+                .insert(layer::LayerComponent {
+                    speed: match layer.speed {
+                        layer::LayerSpeed::Horizontal(vx) => Vec2::new(vx, 0.0),
+                        layer::LayerSpeed::Vertical(vy) => Vec2::new(0.0, vy),
+                        layer::LayerSpeed::Bidirectional(vx, vy) => Vec2::new(vx, vy),
+                    },
+                    repeat: layer.repeat.clone(),
+                    texture_count,
+                    camera: self.camera,
+                })
+                .insert(RenderLayers::from_layers(&[render_layer]));
+        };
     }
 }
 
@@ -175,7 +172,6 @@ impl ParallaxMoveEvent {
 #[derive(Component)]
 pub struct ParallaxCameraComponent {
     pub render_layer: u8,
-    pub entities: Vec<Entity>,
 }
 
 impl ParallaxCameraComponent {
@@ -191,7 +187,6 @@ impl Default for ParallaxCameraComponent {
     fn default() -> Self {
         Self {
             render_layer: 0,
-            entities: vec![],
         }
     }
 }

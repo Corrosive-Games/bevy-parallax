@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::view::RenderLayers, window::PrimaryWindow};
+use bevy::{prelude::*, window::PrimaryWindow};
 
 pub mod layer;
 pub mod parallax;
@@ -32,31 +32,31 @@ fn create_parallax_system(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    mut parallax_query: Query<(&mut ParallaxCameraComponent, &Camera)>,
+    parallax_query: Query<(Entity, &ParallaxCameraComponent, &Camera)>,
+    layers_query: Query<(Entity, &LayerComponent)>,
     mut create_parallax_events: EventReader<CreateParallaxEvent>,
 ) {
     let primary_window = window_query.get_single().unwrap();
     let mut window_size = Vec2::new(primary_window.width(), primary_window.height());
     for event in create_parallax_events.iter() {
-        if let Ok((mut parallax, camera)) = parallax_query.get_mut(event.camera) {
-            for entity in parallax.entities.iter() {
-                commands.entity(*entity).despawn_recursive();
+        if let Ok((parallax_entity, parallax, camera)) = parallax_query.get(event.camera) {
+            for (entity, layer) in layers_query.iter() {
+                // If it is not my layer don't despawn
+                if layer.camera != parallax_entity {
+                    continue;
+                }
+                commands.entity(entity).despawn_recursive();
             }
             if let Some(viewport) = &camera.viewport {
                 window_size = viewport.physical_size.as_vec2();
             }
-            parallax.entities = event.create_layers(
+            event.create_layers(
                 &mut commands,
                 window_size,
                 &asset_server,
                 &mut texture_atlases,
                 parallax.render_layer,
             );
-            for entity in parallax.entities.iter() {
-                commands
-                    .entity(*entity)
-                    .insert(RenderLayers::from_layers(&[parallax.render_layer]));
-            }
         }
     }
 }
