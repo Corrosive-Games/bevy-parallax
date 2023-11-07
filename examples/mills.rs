@@ -55,7 +55,7 @@ pub fn initialize_camera_system(
                 cols: 6,
                 rows: 1,
                 scale: 0.15,
-                z: 0.0,
+                z: 0.6,
                 position: Vec2::new(0., 50.),
                 color: Color::BLACK,
                 ..default()
@@ -69,7 +69,7 @@ pub fn initialize_camera_system(
                 cols: 6,
                 rows: 1,
                 scale: 0.25,
-                z: 0.0,
+                z: 0.7,
                 position: Vec2::new(0., 50.),
                 color: Color::DARK_GRAY,
                 ..default()
@@ -83,7 +83,7 @@ pub fn initialize_camera_system(
                 cols: 6,
                 rows: 1,
                 scale: 0.5,
-                z: 0.0,
+                z: 0.8,
                 position: Vec2::new(0., 25.),
                 color: Color::GRAY,
                 ..default()
@@ -97,7 +97,7 @@ pub fn initialize_camera_system(
                 cols: 6,
                 rows: 1,
                 scale: 0.8,
-                z: 0.0,
+                z: 0.9,
                 color: Color::WHITE,
                 ..default()
             },
@@ -125,7 +125,7 @@ pub fn move_camera_system(
     mut camera_query: Query<(Entity, &mut Transform), With<Camera>>,
 ) {
     let (camera, mut camera_transform) = camera_query.get_single_mut().unwrap();
-    let speed = 9.;
+    let speed = 20.;
     let mut direction = Vec2::ZERO;
     if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
         direction += Vec2::new(1.0, 0.0);
