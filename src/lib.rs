@@ -38,7 +38,7 @@ fn create_parallax_system(
 ) {
     let primary_window = window_query.get_single().unwrap();
     let mut window_size = Vec2::new(primary_window.width(), primary_window.height());
-    for event in create_parallax_events.iter() {
+    for event in create_parallax_events.read() {
         if let Ok((parallax_entity, parallax, camera)) = parallax_query.get(event.camera) {
             for (entity, layer) in layers_query.iter() {
                 // If it is not my layer don't despawn
@@ -67,7 +67,7 @@ fn follow_camera_system(
     mut layer_query: Query<(&mut Transform, &LayerComponent), Without<ParallaxCameraComponent>>,
     mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
-    for event in move_events.iter() {
+    for event in move_events.read() {
         if let Ok(mut camera_transform) = camera_query.get_mut(event.camera) {
             camera_transform.translation += event.camera_move_speed.extend(0.0);
             for (mut layer_transform, layer) in layer_query.iter_mut() {
@@ -89,7 +89,7 @@ fn update_layer_textures_system(
             &GlobalTransform,
             &mut Transform,
             &LayerTextureComponent,
-            &ComputedVisibility,
+            &ViewVisibility,
         ),
         Without<ParallaxCameraComponent>,
     >,
@@ -97,7 +97,7 @@ fn update_layer_textures_system(
     window_query: Query<&Window, With<PrimaryWindow>>,
     mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
-    for event in move_events.iter() {
+    for event in move_events.read() {
         if !event.has_movement() {
             continue;
         }
@@ -120,7 +120,7 @@ fn update_layer_textures_system(
                         computed_visibility,
                     ) = texture_query.get_mut(child).unwrap();
                     // Do not move visible textures
-                    if computed_visibility.is_visible() {
+                    if computed_visibility.get() {
                         continue;
                     }
                     let texture_gtransform = texture_gtransform.compute_transform();
