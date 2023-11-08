@@ -5,7 +5,7 @@
 		tile_size: (256.0, 596.0),
 		cols: 1,
 		rows: 1,
-		scale: 1.25,
+		scale: (1.25, 1.25),
 		z: 0.0,
 		color: Rgba(
 			red: 0.5,
@@ -20,7 +20,7 @@
 		tile_size: (256.0, 596.0),
 		cols: 1,
 		rows: 1,
-		scale: 1.25,
+		scale: (1.25, 1.25),
 		z: 1.0,
 		color: Rgba(
 			red: 0.5,
@@ -35,7 +35,7 @@
 		tile_size: (256.0, 596.0),
 		cols: 1,
 		rows: 1,
-		scale: 1.25,
+		scale: (1.25, 1.25),
 		z: 2.0,
 		color: Rgba(
 			red: 0.7,
@@ -50,7 +50,7 @@
 		tile_size: (256.0, 596.0),
 		cols: 1,
 		rows: 1,
-		scale: 1.25,
+		scale: (1.25, 1.25),
 		z: 3.0,
 		color: Rgba(
 			red: 0.7,
@@ -65,7 +65,7 @@
 		tile_size: (256.0, 596.0),
 		cols: 1,
 		rows: 1,
-		scale: 1.25,
+		scale: (1.25, 1.25),
 		z: 4.0,
 		color: Rgba(
 			red: 0.7,
@@ -80,7 +80,7 @@
 		tile_size: (256.0, 596.0),
 		cols: 1,
 		rows: 1,
-		scale: 1.25,
+		scale: (1.25, 1.25),
 		z: 5.0,
 		color: Rgba(
 			red: 0.7,

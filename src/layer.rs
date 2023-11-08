@@ -105,7 +105,7 @@ pub struct LayerData {
     /// Rows in the texture file
     pub rows: usize,
     /// Scale of the texture
-    pub scale: f32,
+    pub scale: Vec2,
     /// Z position of the layer
     pub z: f32,
     /// Default initial position of the Entity container
@@ -123,7 +123,7 @@ impl Default for LayerData {
             tile_size: Vec2::ZERO,
             cols: 1,
             rows: 1,
-            scale: 1.0,
+            scale: Vec2::ONE,
             z: 0.0,
             position: Vec2::ZERO,
             color: Color::WHITE,

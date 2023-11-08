@@ -39,7 +39,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
                 tile_size: Vec2::new(96.0, 160.0),
                 cols: 1,
                 rows: 1,
-                scale: 4.5,
+                scale: Vec2::splat(4.5),
                 z: 0.0,
                 ..Default::default()
             },
@@ -49,7 +49,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
                 tile_size: Vec2::new(144.0, 160.0),
                 cols: 1,
                 rows: 1,
-                scale: 4.5,
+                scale: Vec2::splat(4.5),
                 z: 1.0,
                 ..Default::default()
             },
@@ -59,7 +59,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
                 tile_size: Vec2::new(272.0, 160.0),
                 cols: 1,
                 rows: 1,
-                scale: 4.5,
+                scale: Vec2::splat(4.5),
                 z: 2.0,
                 ..Default::default()
             },

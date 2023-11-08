@@ -50,7 +50,7 @@ pub fn initialize_camera_system(
                 tile_size: Vec2::new(96.0, 160.0),
                 cols: 1,
                 rows: 1,
-                scale: 4.5,
+                scale: Vec2::splat(4.5),
                 z: 0.0,
                 ..default()
             },
@@ -59,9 +59,7 @@ pub fn initialize_camera_system(
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_middle.png".to_string(),
                 tile_size: Vec2::new(144.0, 160.0),
-                cols: 1,
-                rows: 1,
-                scale: 4.5,
+                scale: Vec2::splat(4.5),
                 z: 1.0,
                 ..default()
             },
@@ -72,7 +70,7 @@ pub fn initialize_camera_system(
                 tile_size: Vec2::new(272.0, 160.0),
                 cols: 1,
                 rows: 1,
-                scale: 4.5,
+                scale: Vec2::splat(4.5),
                 z: 2.0,
                 ..default()
             },

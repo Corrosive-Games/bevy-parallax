@@ -52,12 +52,12 @@ impl CreateParallaxEvent {
             let max_length = window_size.length();
 
             let y_max_index = match layer.repeat.has_vertical() {
-                true => f32::ceil(max_length / (layer.tile_size.y * layer.scale)) as i32,
+                true => f32::ceil(max_length / (layer.tile_size.y * layer.scale.y)) as i32,
                 false => 0,
             };
 
             let x_max_index = match layer.repeat.has_horizontal() {
-                true => f32::ceil(max_length / (layer.tile_size.x * layer.scale)) as i32,
+                true => f32::ceil(max_length / (layer.tile_size.x * layer.scale.x)) as i32,
                 false => 0,
             };
 
@@ -85,7 +85,7 @@ impl CreateParallaxEvent {
                 .insert(SpatialBundle {
                     transform: Transform {
                         translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
-                        scale: Vec3::new(layer.scale, layer.scale, 1.0),
+                        scale: layer.scale.extend(1.0),
                         ..default()
                     },
                     ..default()
