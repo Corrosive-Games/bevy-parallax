@@ -1,4 +1,4 @@
-use crate::{layer, SpriteFrameUpdate};
+use crate::layer;
 use bevy::{prelude::*, render::view::RenderLayers};
 
 /// Event to setup and create parallax
@@ -17,27 +17,16 @@ impl CreateParallaxEvent {
         asset_server: &AssetServer,
         texture_atlases: &mut Assets<TextureAtlas>,
         render_layer: u8,
-    )  {
+    ) {
         // Spawn new layers using layer_data
         for (i, layer) in self.layers_data.iter().enumerate() {
-            // Setup texture
             let texture_handle = asset_server.load(&layer.path);
-            let sprites = layer.cols * layer.rows;
-            let texture_atlas = TextureAtlas::from_grid(
-                texture_handle,
-                layer.tile_size,
-                layer.cols,
-                layer.rows,
-                None,
-                None,
-            );
+            let texture_atlas = layer.create_texture_atlas(texture_handle);
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
-            let spritesheet_bundle = SpriteSheetBundle {
+
+            let sprite_sheet_bundle = SpriteSheetBundle {
                 texture_atlas: texture_atlas_handle,
-                sprite: TextureAtlasSprite {
-                    color: layer.color,
-                    ..default()
-                },
+                sprite: layer.create_texture_atlas_sprite(),
                 ..default()
             };
 
@@ -93,7 +82,7 @@ impl CreateParallaxEvent {
                 .with_children(|parent| {
                     for x in x_range {
                         for y in y_range.clone() {
-                            let mut adjusted_spritesheet_bundle = spritesheet_bundle.clone();
+                            let mut adjusted_spritesheet_bundle = sprite_sheet_bundle.clone();
                             if x != 0 {
                                 adjusted_spritesheet_bundle = layer
                                     .repeat
@@ -113,12 +102,9 @@ impl CreateParallaxEvent {
                             let mut child_commands = parent.spawn(adjusted_spritesheet_bundle);
                             child_commands
                                 .insert(RenderLayers::from_layers(&[render_layer]))
-                                .insert(layer::LayerTextureComponent {
-                                    width: layer.tile_size.x,
-                                    height: layer.tile_size.y,
-                                });
-                            if sprites > 1 {
-                                child_commands.insert(SpriteFrameUpdate::linear_fps(20., sprites));
+                                .insert(layer.crate_layer_texture());
+                            if let Some(animation_bundle) = layer.create_animation_bundle() {
+                                child_commands.insert(animation_bundle);
                             }
                         }
                     }
@@ -137,7 +123,7 @@ impl CreateParallaxEvent {
                     camera: self.camera,
                 })
                 .insert(RenderLayers::from_layers(&[render_layer]));
-        };
+        }
     }
 }
 
@@ -189,9 +175,7 @@ impl ParallaxCameraComponent {
 
 impl Default for ParallaxCameraComponent {
     fn default() -> Self {
-        Self {
-            render_layer: 0,
-        }
+        Self { render_layer: 0 }
     }
 }
 

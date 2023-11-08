@@ -1,5 +1,9 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use serde::Deserialize;
+
+use crate::SpriteFrameUpdate;
 
 /// Layer speed type.
 /// Layers with horizontal or vertical speed are only able to travel in one direction,
@@ -86,6 +90,29 @@ impl LayerRepeat {
     }
 }
 
+#[derive(Debug, Deserialize, Resource)]
+pub enum Animation {
+    FPS(f32),
+    FrameDuration(Duration),
+    TotalDuration(Duration),
+}
+
+impl Animation {
+    pub fn to_sprite_update(&self, layer_data: &LayerData) -> SpriteFrameUpdate {
+        let total = layer_data.cols * layer_data.rows;
+        let duration = match self {
+            Self::FPS(fps) => Duration::from_secs_f32(1. / fps),
+            Self::FrameDuration(duration) => duration.clone(),
+            Self::TotalDuration(duration) => duration.div_f32(total as f32),
+        };
+        SpriteFrameUpdate {
+            total,
+            index: layer_data.index,
+            timer: Timer::new(duration, TimerMode::Repeating),
+        }
+    }
+}
+
 /// Layer initialization data
 #[derive(Debug, Deserialize, Resource)]
 #[serde(default)]
@@ -112,6 +139,48 @@ pub struct LayerData {
     pub position: Vec2,
 
     pub color: Color,
+
+    pub index: usize,
+
+    pub flip: (bool, bool),
+
+    pub animation: Option<Animation>,
+}
+
+impl LayerData {
+    pub fn create_texture_atlas(&self, texture_handle: Handle<Image>) -> TextureAtlas {
+        TextureAtlas::from_grid(
+            texture_handle,
+            self.tile_size,
+            self.cols,
+            self.rows,
+            None,
+            None,
+        )
+    }
+
+    pub fn create_texture_atlas_sprite(&self) -> TextureAtlasSprite {
+        TextureAtlasSprite {
+            index: self.index,
+            color: self.color,
+            flip_x: self.flip.0,
+            flip_y: self.flip.1,
+            ..default()
+        }
+    }
+
+    pub fn crate_layer_texture(&self) -> LayerTextureComponent {
+        LayerTextureComponent {
+            width: self.tile_size.x,
+            height: self.tile_size.y,
+        }
+    }
+
+    pub fn create_animation_bundle(&self) -> Option<impl Bundle> {
+        self.animation
+            .as_ref()
+            .map(|animation| animation.to_sprite_update(self))
+    }
 }
 
 impl Default for LayerData {
@@ -127,6 +196,9 @@ impl Default for LayerData {
             z: 0.0,
             position: Vec2::ZERO,
             color: Color::WHITE,
+            index: 0,
+            flip: (false, false),
+            animation: None,
         }
     }
 }

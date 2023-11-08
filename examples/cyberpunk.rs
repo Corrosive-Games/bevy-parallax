@@ -55,12 +55,24 @@ pub fn initialize_camera_system(
                 ..default()
             },
             LayerData {
+                speed: LayerSpeed::Bidirectional(0.7, 0.85),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
+                path: "cyberpunk_middle.png".to_string(),
+                tile_size: Vec2::new(144.0, 160.0),
+                scale: Vec2::splat(4.5),
+                z: 0.5,
+                flip: (true, false),
+                position: Vec2::new(0., 48.),
+                ..default()
+            },
+            LayerData {
                 speed: LayerSpeed::Bidirectional(0.6, 0.8),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_middle.png".to_string(),
                 tile_size: Vec2::new(144.0, 160.0),
                 scale: Vec2::splat(4.5),
                 z: 1.0,
+                position: Vec2::new(0., -64.),
                 ..default()
             },
             LayerData {

@@ -2,8 +2,8 @@ use bevy::prelude::*;
 #[cfg(feature = "bevy-inspector-egui")]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_parallax::{
-    CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, LayerTextureComponent,
-    ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxSystems, RepeatStrategy,
+    Animation, CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, ParallaxCameraComponent,
+    ParallaxMoveEvent, ParallaxPlugin, ParallaxSystems, RepeatStrategy,
 };
 
 fn main() {
@@ -58,6 +58,7 @@ pub fn initialize_camera_system(
                 z: 0.6,
                 position: Vec2::new(0., 50.),
                 color: Color::BLACK,
+                animation: Some(Animation::FPS(30.)),
                 ..default()
             },
             LayerData {
@@ -72,6 +73,8 @@ pub fn initialize_camera_system(
                 z: 0.7,
                 position: Vec2::new(0., 50.),
                 color: Color::DARK_GRAY,
+                index: 2,
+                animation: Some(Animation::FPS(28.)),
                 ..default()
             },
             LayerData {
@@ -86,6 +89,8 @@ pub fn initialize_camera_system(
                 z: 0.8,
                 position: Vec2::new(0., 25.),
                 color: Color::GRAY,
+                index: 5,
+                animation: Some(Animation::FPS(26.)),
                 ..default()
             },
             LayerData {
@@ -99,6 +104,8 @@ pub fn initialize_camera_system(
                 scale: Vec2::splat(0.8),
                 z: 0.9,
                 color: Color::WHITE,
+                index: 1,
+                animation: Some(Animation::FPS(24.)),
                 ..default()
             },
             LayerData {
@@ -111,6 +118,8 @@ pub fn initialize_camera_system(
                 z: 1.0,
                 scale: Vec2::splat(1.5),
                 position: Vec2::new(0., -100.),
+                index: 3,
+                animation: Some(Animation::FPS(20.)),
                 ..default()
             },
         ],
