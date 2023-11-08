@@ -18,22 +18,31 @@ pub enum LayerSpeed {
 #[derive(Debug, Deserialize, Clone)]
 pub enum RepeatStrategy {
     Same,
-    Mirror,
+    MirrorHorizontally,
+    MirrorVertically,
+    MirrorBoth,
 }
 
 impl RepeatStrategy {
     pub fn transform(
         &self,
-        mut spritesheet_bundle: SpriteSheetBundle,
+        sprite_sheet_bundle: &mut SpriteSheetBundle,
         pos: (i32, i32),
-    ) -> SpriteSheetBundle {
+    ) {
         match self {
-            Self::Same => spritesheet_bundle,
-            Self::Mirror => {
+            Self::Same => (),
+            Self::MirrorHorizontally => {
+                let (x, _) = pos;
+                sprite_sheet_bundle.sprite.flip_x ^= x % 2 != 0;
+            }
+            Self::MirrorVertically => {
+                let (_, y) = pos;
+                sprite_sheet_bundle.sprite.flip_y ^= y % 2 != 0;
+            }
+            Self::MirrorBoth => {
                 let (x, y) = pos;
-                spritesheet_bundle.sprite.flip_x = x % 2 != 0;
-                spritesheet_bundle.sprite.flip_y = y % 2 != 0;
-                spritesheet_bundle
+                sprite_sheet_bundle.sprite.flip_x ^= x % 2 != 0;
+                sprite_sheet_bundle.sprite.flip_y ^= y % 2 != 0;
             }
         }
     }
@@ -43,12 +52,12 @@ impl RepeatStrategy {
 pub enum LayerRepeat {
     Horizontal(RepeatStrategy),
     Vertical(RepeatStrategy),
-    Bidirectional(RepeatStrategy, RepeatStrategy),
+    Bidirectional(RepeatStrategy),
 }
 
 impl LayerRepeat {
     pub fn both(strategy: RepeatStrategy) -> Self {
-        Self::Bidirectional(strategy.clone(), strategy)
+        Self::Bidirectional(strategy)
     }
 
     pub fn horizontally(strategy: RepeatStrategy) -> Self {
@@ -73,19 +82,11 @@ impl LayerRepeat {
         }
     }
 
-    pub fn get_horizontal_strategy(&self) -> RepeatStrategy {
+    pub fn get_strategy(&self) -> RepeatStrategy {
         match self {
             Self::Horizontal(strategy) => strategy.clone(),
-            Self::Bidirectional(strategy, _) => strategy.clone(),
-            _ => RepeatStrategy::Same,
-        }
-    }
-
-    pub fn get_vertical_strategy(&self) -> RepeatStrategy {
-        match self {
+            Self::Bidirectional(strategy) => strategy.clone(),
             Self::Vertical(strategy) => strategy.clone(),
-            Self::Bidirectional(_, strategy) => strategy.clone(),
-            _ => RepeatStrategy::Same,
         }
     }
 }
@@ -187,7 +188,7 @@ impl Default for LayerData {
     fn default() -> Self {
         Self {
             speed: LayerSpeed::Horizontal(1.0),
-            repeat: LayerRepeat::Bidirectional(RepeatStrategy::Same, RepeatStrategy::Same),
+            repeat: LayerRepeat::Bidirectional(RepeatStrategy::MirrorBoth),
             path: "".to_string(),
             tile_size: Vec2::ZERO,
             cols: 1,

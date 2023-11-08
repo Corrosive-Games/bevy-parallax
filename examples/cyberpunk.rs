@@ -77,7 +77,7 @@ pub fn initialize_camera_system(
             },
             LayerData {
                 speed: LayerSpeed::Bidirectional(0.1, 0.3),
-                repeat: LayerRepeat::both(RepeatStrategy::Mirror),
+                repeat: LayerRepeat::both(RepeatStrategy::MirrorHorizontally),
                 path: "cyberpunk_front.png".to_string(),
                 tile_size: Vec2::new(272.0, 160.0),
                 cols: 1,

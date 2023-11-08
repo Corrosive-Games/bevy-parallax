@@ -95,7 +95,7 @@ pub fn initialize_camera_system(
             },
             LayerData {
                 speed: LayerSpeed::Bidirectional(0.9, 0.9),
-                repeat: LayerRepeat::horizontally(RepeatStrategy::Mirror),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::MirrorBoth),
                 path: "mills-back.png".to_string(),
                 tile_size: Vec2::new(1123., 794.),
                 //tile_size: Vec2::new(751.0, 439.),
@@ -110,7 +110,7 @@ pub fn initialize_camera_system(
             },
             LayerData {
                 speed: LayerSpeed::Bidirectional(0.8, 0.8),
-                repeat: LayerRepeat::horizontally(RepeatStrategy::Mirror),
+                repeat: LayerRepeat::horizontally(RepeatStrategy::MirrorBoth),
                 path: "mills-front.png".to_string(),
                 tile_size: Vec2::new(750.0, 434.),
                 cols: 6,

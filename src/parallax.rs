@@ -82,19 +82,9 @@ impl CreateParallaxEvent {
                 .with_children(|parent| {
                     for x in x_range {
                         for y in y_range.clone() {
+                            let repeat_strategy = layer.repeat.get_strategy();
                             let mut adjusted_spritesheet_bundle = sprite_sheet_bundle.clone();
-                            if x != 0 {
-                                adjusted_spritesheet_bundle = layer
-                                    .repeat
-                                    .get_horizontal_strategy()
-                                    .transform(adjusted_spritesheet_bundle, (x, y))
-                            }
-                            if y != 0 {
-                                adjusted_spritesheet_bundle = layer
-                                    .repeat
-                                    .get_vertical_strategy()
-                                    .transform(adjusted_spritesheet_bundle, (x, y))
-                            }
+                            repeat_strategy.transform(&mut adjusted_spritesheet_bundle, (x, y));
                             adjusted_spritesheet_bundle.transform.translation.x =
                                 layer.tile_size.x * x as f32;
                             adjusted_spritesheet_bundle.transform.translation.y =
