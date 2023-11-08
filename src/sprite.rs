@@ -9,25 +9,7 @@ pub struct SpriteFrameUpdate {
     pub timer: Timer,
 }
 
-impl Default for SpriteFrameUpdate {
-    fn default() -> Self {
-        Self {
-            index: 0,
-            total: 1,
-            timer: Timer::new(Duration::from_millis(2500), TimerMode::Repeating),
-        }
-    }
-}
-
 impl SpriteFrameUpdate {
-    pub fn linear_fps(fps: f32, size: usize) -> Self {
-        Self {
-            timer: Timer::new(Duration::from_secs_f32(1. / fps), TimerMode::Repeating),
-            index: 0,
-            total: size,
-        }
-    }
-
     pub fn next_index(&mut self, duration: Duration) -> usize {
         self.timer.tick(duration);
         if self.timer.just_finished() {

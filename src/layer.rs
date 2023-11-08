@@ -24,11 +24,7 @@ pub enum RepeatStrategy {
 }
 
 impl RepeatStrategy {
-    pub fn transform(
-        &self,
-        sprite_sheet_bundle: &mut SpriteSheetBundle,
-        pos: (i32, i32),
-    ) {
+    pub fn transform(&self, sprite_sheet_bundle: &mut SpriteSheetBundle, pos: (i32, i32)) {
         match self {
             Self::Same => (),
             Self::MirrorHorizontally => {
@@ -188,7 +184,7 @@ impl Default for LayerData {
     fn default() -> Self {
         Self {
             speed: LayerSpeed::Horizontal(1.0),
-            repeat: LayerRepeat::Bidirectional(RepeatStrategy::MirrorBoth),
+            repeat: LayerRepeat::Bidirectional(RepeatStrategy::Same),
             path: "".to_string(),
             tile_size: Vec2::ZERO,
             cols: 1,
