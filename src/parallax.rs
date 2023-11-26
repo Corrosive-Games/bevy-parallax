@@ -17,26 +17,16 @@ impl CreateParallaxEvent {
         asset_server: &AssetServer,
         texture_atlases: &mut Assets<TextureAtlas>,
         render_layer: u8,
-    )  {
+    ) {
         // Spawn new layers using layer_data
         for (i, layer) in self.layers_data.iter().enumerate() {
-            // Setup texture
             let texture_handle = asset_server.load(&layer.path);
-            let texture_atlas = TextureAtlas::from_grid(
-                texture_handle,
-                layer.tile_size,
-                layer.cols,
-                layer.rows,
-                None,
-                None,
-            );
+            let texture_atlas = layer.create_texture_atlas(texture_handle);
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
-            let spritesheet_bundle = SpriteSheetBundle {
+
+            let sprite_sheet_bundle = SpriteSheetBundle {
                 texture_atlas: texture_atlas_handle,
-                sprite: TextureAtlasSprite {
-                    color: layer.color,
-                    ..default()
-                },
+                sprite: layer.create_texture_atlas_sprite(),
                 ..default()
             };
 
@@ -51,12 +41,12 @@ impl CreateParallaxEvent {
             let max_length = window_size.length();
 
             let y_max_index = match layer.repeat.has_vertical() {
-                true => f32::ceil(max_length / (layer.tile_size.y * layer.scale)) as i32,
+                true => f32::ceil(max_length / (layer.tile_size.y * layer.scale.y)) as i32,
                 false => 0,
             };
 
             let x_max_index = match layer.repeat.has_horizontal() {
-                true => f32::ceil(max_length / (layer.tile_size.x * layer.scale)) as i32,
+                true => f32::ceil(max_length / (layer.tile_size.x * layer.scale.x)) as i32,
                 false => 0,
             };
 
@@ -84,7 +74,7 @@ impl CreateParallaxEvent {
                 .insert(SpatialBundle {
                     transform: Transform {
                         translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
-                        scale: Vec3::new(layer.scale, layer.scale, 1.0),
+                        scale: layer.scale.extend(1.0),
                         ..default()
                     },
                     ..default()
@@ -92,30 +82,20 @@ impl CreateParallaxEvent {
                 .with_children(|parent| {
                     for x in x_range {
                         for y in y_range.clone() {
-                            let mut adjusted_spritesheet_bundle = spritesheet_bundle.clone();
-                            if x != 0 {
-                                adjusted_spritesheet_bundle = layer
-                                    .repeat
-                                    .get_horizontal_strategy()
-                                    .transform(adjusted_spritesheet_bundle, (x, y))
-                            }
-                            if y != 0 {
-                                adjusted_spritesheet_bundle = layer
-                                    .repeat
-                                    .get_vertical_strategy()
-                                    .transform(adjusted_spritesheet_bundle, (x, y))
-                            }
+                            let repeat_strategy = layer.repeat.get_strategy();
+                            let mut adjusted_spritesheet_bundle = sprite_sheet_bundle.clone();
+                            repeat_strategy.transform(&mut adjusted_spritesheet_bundle, (x, y));
                             adjusted_spritesheet_bundle.transform.translation.x =
                                 layer.tile_size.x * x as f32;
                             adjusted_spritesheet_bundle.transform.translation.y =
                                 layer.tile_size.y * y as f32;
-                            parent
-                                .spawn(adjusted_spritesheet_bundle)
+                            let mut child_commands = parent.spawn(adjusted_spritesheet_bundle);
+                            child_commands
                                 .insert(RenderLayers::from_layers(&[render_layer]))
-                                .insert(layer::LayerTextureComponent {
-                                    width: layer.tile_size.x,
-                                    height: layer.tile_size.y,
-                                });
+                                .insert(layer.crate_layer_texture());
+                            if let Some(animation_bundle) = layer.create_animation_bundle() {
+                                child_commands.insert(animation_bundle);
+                            }
                         }
                     }
                 });
@@ -133,7 +113,7 @@ impl CreateParallaxEvent {
                     camera: self.camera,
                 })
                 .insert(RenderLayers::from_layers(&[render_layer]));
-        };
+        }
     }
 }
 
@@ -185,9 +165,7 @@ impl ParallaxCameraComponent {
 
 impl Default for ParallaxCameraComponent {
     fn default() -> Self {
-        Self {
-            render_layer: 0,
-        }
+        Self { render_layer: 0 }
     }
 }
 

@@ -1,5 +1,9 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use serde::Deserialize;
+
+use crate::SpriteFrameUpdate;
 
 /// Layer speed type.
 /// Layers with horizontal or vertical speed are only able to travel in one direction,
@@ -14,22 +18,27 @@ pub enum LayerSpeed {
 #[derive(Debug, Deserialize, Clone)]
 pub enum RepeatStrategy {
     Same,
-    Mirror,
+    MirrorHorizontally,
+    MirrorVertically,
+    MirrorBoth,
 }
 
 impl RepeatStrategy {
-    pub fn transform(
-        &self,
-        mut spritesheet_bundle: SpriteSheetBundle,
-        pos: (i32, i32),
-    ) -> SpriteSheetBundle {
+    pub fn transform(&self, sprite_sheet_bundle: &mut SpriteSheetBundle, pos: (i32, i32)) {
         match self {
-            Self::Same => spritesheet_bundle,
-            Self::Mirror => {
+            Self::Same => (),
+            Self::MirrorHorizontally => {
+                let (x, _) = pos;
+                sprite_sheet_bundle.sprite.flip_x ^= x % 2 != 0;
+            }
+            Self::MirrorVertically => {
+                let (_, y) = pos;
+                sprite_sheet_bundle.sprite.flip_y ^= y % 2 != 0;
+            }
+            Self::MirrorBoth => {
                 let (x, y) = pos;
-                spritesheet_bundle.sprite.flip_x = x % 2 != 0;
-                spritesheet_bundle.sprite.flip_y = y % 2 != 0;
-                spritesheet_bundle
+                sprite_sheet_bundle.sprite.flip_x ^= x % 2 != 0;
+                sprite_sheet_bundle.sprite.flip_y ^= y % 2 != 0;
             }
         }
     }
@@ -39,12 +48,12 @@ impl RepeatStrategy {
 pub enum LayerRepeat {
     Horizontal(RepeatStrategy),
     Vertical(RepeatStrategy),
-    Bidirectional(RepeatStrategy, RepeatStrategy),
+    Bidirectional(RepeatStrategy),
 }
 
 impl LayerRepeat {
     pub fn both(strategy: RepeatStrategy) -> Self {
-        Self::Bidirectional(strategy.clone(), strategy)
+        Self::Bidirectional(strategy)
     }
 
     pub fn horizontally(strategy: RepeatStrategy) -> Self {
@@ -69,19 +78,34 @@ impl LayerRepeat {
         }
     }
 
-    pub fn get_horizontal_strategy(&self) -> RepeatStrategy {
+    pub fn get_strategy(&self) -> RepeatStrategy {
         match self {
             Self::Horizontal(strategy) => strategy.clone(),
-            Self::Bidirectional(strategy, _) => strategy.clone(),
-            _ => RepeatStrategy::Same,
+            Self::Bidirectional(strategy) => strategy.clone(),
+            Self::Vertical(strategy) => strategy.clone(),
         }
     }
+}
 
-    pub fn get_vertical_strategy(&self) -> RepeatStrategy {
-        match self {
-            Self::Vertical(strategy) => strategy.clone(),
-            Self::Bidirectional(_, strategy) => strategy.clone(),
-            _ => RepeatStrategy::Same,
+#[derive(Debug, Deserialize, Resource)]
+pub enum Animation {
+    FPS(f32),
+    FrameDuration(Duration),
+    TotalDuration(Duration),
+}
+
+impl Animation {
+    pub fn to_sprite_update(&self, layer_data: &LayerData) -> SpriteFrameUpdate {
+        let total = layer_data.cols * layer_data.rows;
+        let duration = match self {
+            Self::FPS(fps) => Duration::from_secs_f32(1. / fps),
+            Self::FrameDuration(duration) => duration.clone(),
+            Self::TotalDuration(duration) => duration.div_f32(total as f32),
+        };
+        SpriteFrameUpdate {
+            total,
+            index: layer_data.index,
+            timer: Timer::new(duration, TimerMode::Repeating),
         }
     }
 }
@@ -105,28 +129,73 @@ pub struct LayerData {
     /// Rows in the texture file
     pub rows: usize,
     /// Scale of the texture
-    pub scale: f32,
+    pub scale: Vec2,
     /// Z position of the layer
     pub z: f32,
     /// Default initial position of the Entity container
     pub position: Vec2,
 
     pub color: Color,
+
+    pub index: usize,
+
+    pub flip: (bool, bool),
+
+    pub animation: Option<Animation>,
+}
+
+impl LayerData {
+    pub fn create_texture_atlas(&self, texture_handle: Handle<Image>) -> TextureAtlas {
+        TextureAtlas::from_grid(
+            texture_handle,
+            self.tile_size,
+            self.cols,
+            self.rows,
+            None,
+            None,
+        )
+    }
+
+    pub fn create_texture_atlas_sprite(&self) -> TextureAtlasSprite {
+        TextureAtlasSprite {
+            index: self.index,
+            color: self.color,
+            flip_x: self.flip.0,
+            flip_y: self.flip.1,
+            ..default()
+        }
+    }
+
+    pub fn crate_layer_texture(&self) -> LayerTextureComponent {
+        LayerTextureComponent {
+            width: self.tile_size.x,
+            height: self.tile_size.y,
+        }
+    }
+
+    pub fn create_animation_bundle(&self) -> Option<impl Bundle> {
+        self.animation
+            .as_ref()
+            .map(|animation| animation.to_sprite_update(self))
+    }
 }
 
 impl Default for LayerData {
     fn default() -> Self {
         Self {
             speed: LayerSpeed::Horizontal(1.0),
-            repeat: LayerRepeat::Bidirectional(RepeatStrategy::Same, RepeatStrategy::Same),
+            repeat: LayerRepeat::Bidirectional(RepeatStrategy::Same),
             path: "".to_string(),
             tile_size: Vec2::ZERO,
             cols: 1,
             rows: 1,
-            scale: 1.0,
+            scale: Vec2::ONE,
             z: 0.0,
             position: Vec2::ZERO,
             color: Color::WHITE,
+            index: 0,
+            flip: (false, false),
+            animation: None,
         }
     }
 }

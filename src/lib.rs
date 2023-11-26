@@ -2,15 +2,18 @@ use bevy::{prelude::*, window::PrimaryWindow};
 
 pub mod layer;
 pub mod parallax;
+pub mod sprite;
 
 pub use layer::*;
 pub use parallax::*;
+pub use sprite::*;
 
 pub struct ParallaxPlugin;
 impl Plugin for ParallaxPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<ParallaxMoveEvent>()
             .add_event::<CreateParallaxEvent>()
+            .add_systems(Update, sprite_frame_update_system)
             .add_systems(
                 Update,
                 (create_parallax_system, follow_camera_system).in_set(ParallaxSystems),
@@ -130,12 +133,15 @@ fn update_layer_textures_system(
                         let x_delta = layer_texture.width * layer.texture_count.x;
                         let half_width = layer_texture.width * texture_gtransform.scale.x / 2.0;
                         // Move not visible right texture to left side of layer when camera is moving to left
-                        if event.has_left_movement() && texture_translation.x + half_width < -view_size.x {
+                        if event.has_left_movement()
+                            && texture_translation.x + half_width < -view_size.x
+                        {
                             texture_transform.translation.x -= x_delta;
-                        
                         }
                         // Move not visible left texture to right side of layer when camera is moving to right
-                        if event.has_right_movement() && texture_translation.x - half_width > view_size.x {
+                        if event.has_right_movement()
+                            && texture_translation.x - half_width > view_size.x
+                        {
                             texture_transform.translation.x += x_delta;
                         }
                     }
@@ -143,12 +149,15 @@ fn update_layer_textures_system(
                         let y_delta = layer_texture.height * layer.texture_count.y;
                         let half_height = layer_texture.height * texture_gtransform.scale.y / 2.0;
                         // Move not visible top texture to the bottom of the layer when the camera is moving to the bottom
-                        if event.has_down_movement() && texture_translation.y + half_height < -view_size.y {
+                        if event.has_down_movement()
+                            && texture_translation.y + half_height < -view_size.y
+                        {
                             texture_transform.translation.y -= y_delta;
-                        
                         }
                         // Move not visible bottom texture to the top of the layer when the camera is moving to the top
-                        if event.has_up_movement() && texture_translation.y - half_height > view_size.y {
+                        if event.has_up_movement()
+                            && texture_translation.y - half_height > view_size.y
+                        {
                             texture_transform.translation.y += y_delta;
                         }
                     }
