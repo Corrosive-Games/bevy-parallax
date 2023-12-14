@@ -94,6 +94,7 @@ impl LayerRepeat {
 }
 
 #[derive(Debug, Deserialize, Resource)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub enum Animation {
     FPS(f32),
     FrameDuration(Duration),
@@ -120,7 +121,6 @@ impl Animation {
 #[derive(Debug, Deserialize, Resource)]
 #[serde(default)]
 #[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
-#[cfg_attr(feature = "bevy-inspector-egui", reflect(InspectorOptions))]
 pub struct LayerData {
     /// Relative speed of layer to the camera movement.
     /// If the speed value is set to 1.0, the layer won't move in that direction.

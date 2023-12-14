@@ -160,7 +160,6 @@ impl ParallaxMoveEvent {
 #[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub struct ParallaxCameraComponent {
     pub render_layer: u8,
-    pub entities: Vec<Entity>,
     pub limits: Vec2Limit,
 }
 
@@ -246,7 +245,6 @@ impl Default for ParallaxCameraComponent {
     fn default() -> Self {
         Self {
             render_layer: 0,
-            entities: vec![],
             limits: default(),
         }
     }
