@@ -87,35 +87,35 @@ pub fn initialize_camera_system(
                 ..default()
             },
         ],
-        camera: camera,
-    })
+        camera,
+    });
 }
 
 // Send a ParallaxMoveEvent with the desired camera movement speed
 pub fn move_camera_system(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut move_event_writer: EventWriter<ParallaxMoveEvent>,
     mut camera_query: Query<(Entity, &mut Transform), With<Camera>>,
 ) {
     let (camera, mut camera_transform) = camera_query.get_single_mut().unwrap();
     let speed = 9.;
     let mut direction = Vec2::ZERO;
-    if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
+    if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
         direction += Vec2::new(1.0, 0.0);
     }
-    if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
+    if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
         direction += Vec2::new(-1.0, 0.0);
     }
-    if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
+    if keyboard_input.pressed(KeyCode::KeyW) || keyboard_input.pressed(KeyCode::ArrowUp) {
         direction += Vec2::new(0.0, 1.0);
     }
-    if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
+    if keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown) {
         direction += Vec2::new(0.0, -1.0);
     }
-    if keyboard_input.pressed(KeyCode::E) {
+    if keyboard_input.pressed(KeyCode::KeyE) {
         camera_transform.rotate_z(0.1);
     }
-    if keyboard_input.pressed(KeyCode::Q) {
+    if keyboard_input.pressed(KeyCode::KeyQ) {
         camera_transform.rotate_z(-0.1);
     }
     move_event_writer.send(ParallaxMoveEvent {

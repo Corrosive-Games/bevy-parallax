@@ -145,25 +145,14 @@ pub struct LayerData {
 }
 
 impl LayerData {
-    pub fn create_texture_atlas(&self, texture_handle: Handle<Image>) -> TextureAtlas {
-        TextureAtlas::from_grid(
-            texture_handle,
+    pub fn create_texture_atlas_layout(&self) -> TextureAtlasLayout {
+        TextureAtlasLayout::from_grid(
             self.tile_size,
             self.cols,
             self.rows,
             None,
             None,
         )
-    }
-
-    pub fn create_texture_atlas_sprite(&self) -> TextureAtlasSprite {
-        TextureAtlasSprite {
-            index: self.index,
-            color: self.color,
-            flip_x: self.flip.0,
-            flip_y: self.flip.1,
-            ..default()
-        }
     }
 
     pub fn crate_layer_texture(&self) -> LayerTextureComponent {

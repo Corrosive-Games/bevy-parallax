@@ -95,6 +95,18 @@ pub fn move_camera_system(
 }
 ```
 
+## Compatible Bevy versions
+
+Compatibility of `bevy-parallax` versions:
+
+| Bevy version | `bevy-parallax` version     |
+|:-------------|:----------------------------|
+| `0.13`       | `0.8`                       |
+| `0.12`       | `0.7`                       |
+| `0.11`       | `0.5` - `0.6`               |
+| `0.10`       | `0.4`                       |
+
+
 ## Credits
 
 - [Fish World Pack](https://spicylobster.itch.io/fish-world-pack)

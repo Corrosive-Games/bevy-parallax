@@ -15,18 +15,21 @@ impl CreateParallaxEvent {
         commands: &mut Commands,
         window_size: Vec2,
         asset_server: &AssetServer,
-        texture_atlases: &mut Assets<TextureAtlas>,
+        texture_atlases: &mut Assets<TextureAtlasLayout>,
         render_layer: u8,
     ) {
         // Spawn new layers using layer_data
         for (i, layer) in self.layers_data.iter().enumerate() {
-            let texture_handle = asset_server.load(&layer.path);
-            let texture_atlas = layer.create_texture_atlas(texture_handle);
+            let texture: Handle<Image> = asset_server.load(&layer.path);
+            let texture_atlas = layer.create_texture_atlas_layout();
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
             let sprite_sheet_bundle = SpriteSheetBundle {
-                texture_atlas: texture_atlas_handle,
-                sprite: layer.create_texture_atlas_sprite(),
+                 texture,
+                atlas: TextureAtlas {
+                    layout: texture_atlas_handle,
+                    index: 0,
+                },
                 ..default()
             };
 
