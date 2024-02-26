@@ -1,5 +1,4 @@
 use bevy::{
-    core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
     render::{camera::Viewport, view::RenderLayers},
 };
@@ -40,9 +39,6 @@ pub fn initialize_camera_system(
 ) {
     let left_camera = commands
         .spawn(Camera2dBundle {
-            camera_2d: Camera2d {
-                clear_color: ClearColorConfig::Default,
-            },
             camera: Camera {
                 order: 0,
                 viewport: Some(Viewport {
@@ -60,9 +56,6 @@ pub fn initialize_camera_system(
         .id();
     let right_camera = commands
         .spawn(Camera2dBundle {
-            camera_2d: Camera2d {
-                clear_color: ClearColorConfig::None,
-            },
             camera: Camera {
                 order: 1,
                 viewport: Some(Viewport {
@@ -70,6 +63,7 @@ pub fn initialize_camera_system(
                     physical_size: UVec2::new(1280 / 2, 720),
                     ..default()
                 }),
+                clear_color: ClearColorConfig::None,
                 ..default()
             },
             ..default()
@@ -154,26 +148,26 @@ pub struct InputMap {
 impl InputMap {
     pub fn arrows() -> Self {
         Self {
-            right: KeyCode::Right,
-            left: KeyCode::Left,
-            up: KeyCode::Up,
-            down: KeyCode::Down,
+            right: KeyCode::ArrowRight,
+            left: KeyCode::ArrowLeft,
+            up: KeyCode::ArrowUp,
+            down: KeyCode::ArrowDown,
         }
     }
 
     pub fn awsd() -> Self {
         Self {
-            right: KeyCode::D,
-            left: KeyCode::A,
-            up: KeyCode::W,
-            down: KeyCode::S,
+            right: KeyCode::KeyD,
+            left: KeyCode::KeyA,
+            up: KeyCode::KeyW,
+            down: KeyCode::KeyS,
         }
     }
 }
 
 // Send a ParallaxMoveEvent with the desired camera movement speed
 pub fn move_camera_system(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut move_event_writer: EventWriter<ParallaxMoveEvent>,
     camera_query: Query<(Entity, &InputMap), With<Camera>>,
 ) {

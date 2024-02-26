@@ -21,7 +21,7 @@ impl SpriteFrameUpdate {
 
 pub fn sprite_frame_update_system(
     time: Res<Time>,
-    mut query: Query<(&mut TextureAtlasSprite, &mut SpriteFrameUpdate)>,
+    mut query: Query<(&mut TextureAtlas, &mut SpriteFrameUpdate)>,
 ) {
     for (mut atlas, mut frame) in query.iter_mut() {
         atlas.index = frame.next_index(time.delta());

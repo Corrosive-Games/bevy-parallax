@@ -33,7 +33,7 @@ pub struct ParallaxSystems;
 fn create_parallax_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     parallax_query: Query<(Entity, &ParallaxCameraComponent, &Camera)>,
     layers_query: Query<(Entity, &LayerComponent)>,

@@ -81,41 +81,41 @@ pub fn initialize_camera_system(
 }
 
 pub fn reload_system(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     camera_query: Query<Entity, With<Camera>>,
     mut create_parallax: EventWriter<CreateParallaxEvent>,
 ) {
     let camera = camera_query.get_single().unwrap();
-    if keyboard_input.just_released(KeyCode::R) {
-        create_parallax.send(new_create_parallax_event(camera))
+    if keyboard_input.just_released(KeyCode::KeyR) {
+        create_parallax.send(new_create_parallax_event(camera));
     }
 }
 
 pub fn despawn_all(
     mut commands: Commands,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     all_query: Query<Entity, (Without<Camera>, Without<Window>)>,
 ) {
-    if keyboard_input.just_released(KeyCode::Q) {
+    if keyboard_input.just_released(KeyCode::KeyQ) {
         for entity in all_query.iter() {
-            commands.entity(entity).despawn();
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
 
 // Send a ParallaxMoveEvent with the desired camera movement speed
 pub fn move_camera_system(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut move_event_writer: EventWriter<ParallaxMoveEvent>,
     camera_query: Query<Entity, With<Camera>>,
 ) {
     let camera = camera_query.get_single().unwrap();
-    if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
+    if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(3.0, 0.0),
             camera: camera,
         });
-    } else if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
+    } else if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(-3.0, 0.0),
             camera: camera,
