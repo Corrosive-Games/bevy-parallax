@@ -25,7 +25,8 @@ impl CreateParallaxEvent {
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
             let sprite_sheet_bundle = SpriteSheetBundle {
-                 texture,
+                texture,
+                sprite: layer.create_sprite(),
                 atlas: TextureAtlas {
                     layout: texture_atlas_handle,
                     index: 0,

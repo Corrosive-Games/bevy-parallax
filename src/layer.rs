@@ -155,6 +155,15 @@ impl LayerData {
         )
     }
 
+    pub fn create_sprite(&self) -> Sprite {
+        Sprite {
+            color: self.color,
+            flip_x: self.flip.0,
+            flip_y: self.flip.1,
+            ..Default::default()
+        }
+    }
+
     pub fn crate_layer_texture(&self) -> LayerTextureComponent {
         LayerTextureComponent {
             width: self.tile_size.x,
