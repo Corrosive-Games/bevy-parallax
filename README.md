@@ -49,7 +49,7 @@ pub fn initialize_camera_system(
         layers_data: vec![
             LayerData {
                 speed: LayerSpeed::Horizontal(0.9),
-                path: "back.png".to_string(),
+                path: "cyberpunk_back.png".to_string(),
                 tile_size: Vec2::new(96.0, 160.0),
                 cols: 1,
                 rows: 1,
@@ -59,7 +59,7 @@ pub fn initialize_camera_system(
             },
             LayerData {
                 speed: LayerSpeed::Horizontal(0.6),
-                path: "middle.png".to_string(),
+                path: "cyberpunk_middle.png".to_string(),
                 tile_size: Vec2::new(144.0, 160.0),
                 cols: 1,
                 rows: 1,
@@ -69,7 +69,7 @@ pub fn initialize_camera_system(
             },
             LayerData {
                 speed: LayerSpeed::Horizontal(0.1),
-                path: "front.png".to_string(),
+                path: "cyberpunk_front.png".to_string(),
                 tile_size: Vec2::new(272.0, 160.0),
                 cols: 1,
                 rows: 1,
@@ -84,18 +84,18 @@ pub fn initialize_camera_system(
 }
 
 pub fn move_camera_system(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut move_event_writer: EventWriter<ParallaxMoveEvent>,
     camera_query: Query<Entity, With<Camera>>,
 ) {
     let camera = camera_query.get_single().unwrap();
-    if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
+    if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
         move_event_writer.send(ParallaxMoveEvent {
             translation: Vec2::new(3.0, 0.0),
             rotation: 0.,
             camera: camera,
         });
-    } else if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
+    } else if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
         move_event_writer.send(ParallaxMoveEvent {
             translation: Vec2::new(-3.0, 0.0),
             rotation: 0.,
