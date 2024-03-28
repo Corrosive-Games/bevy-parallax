@@ -1,29 +1,44 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
+pub mod camera;
 pub mod layer;
 pub mod parallax;
 pub mod sprite;
 
+pub use camera::*;
 pub use layer::*;
 pub use parallax::*;
 pub use sprite::*;
 
 pub struct ParallaxPlugin;
+
+impl ParallaxPlugin {
+    #[cfg(feature = "bevy-inspector-egui")]
+    fn add_features(&self, app: &mut App) {
+        app.register_type::<Limit>()
+            .register_type::<CameraFollow>()
+            .register_type::<LayerComponent>()
+            .register_type::<LayerTextureComponent>()
+            .register_type::<ParallaxCameraComponent>();
+    }
+
+    #[cfg(not(feature = "bevy-inspector-egui"))]
+    fn add_features(&self, _app: &mut App) {}
+}
+
 impl Plugin for ParallaxPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<ParallaxMoveEvent>()
             .add_event::<CreateParallaxEvent>()
+            .add_systems(PreUpdate, create_parallax_system)
             .add_systems(Update, sprite_frame_update_system)
             .add_systems(
                 Update,
-                (create_parallax_system, follow_camera_system).in_set(ParallaxSystems),
-            )
-            .add_systems(
-                Update,
-                update_layer_textures_system
-                    .in_set(ParallaxSystems)
-                    .after(follow_camera_system),
+                (camera_follow_system, move_layers_system, update_layer_textures_system)
+                    .chain()
+                    .in_set(ParallaxSystems),
             );
+        self.add_features(app);
     }
 }
 
@@ -65,20 +80,25 @@ fn create_parallax_system(
 }
 
 /// Move camera and background layers
-fn follow_camera_system(
-    mut camera_query: Query<&mut Transform, With<ParallaxCameraComponent>>,
+fn move_layers_system(
+    mut camera_query: Query<(&mut Transform, &ParallaxCameraComponent)>,
     mut layer_query: Query<(&mut Transform, &LayerComponent), Without<ParallaxCameraComponent>>,
     mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
     for event in move_events.read() {
-        if let Ok(mut camera_transform) = camera_query.get_mut(event.camera) {
-            camera_transform.translation += event.camera_move_speed.extend(0.0);
+        if let Ok((mut camera_transform, parallax)) = camera_query.get_mut(event.camera) {
+            let camera_translation = camera_transform.translation.clone();
+            camera_transform.translation = parallax
+                .inside_limits(camera_transform.translation.truncate() + event.translation)
+                .extend(camera_transform.translation.z);
+            let real_translation = camera_transform.translation - camera_translation;
+            camera_transform.rotate_z(event.rotation);
             for (mut layer_transform, layer) in layer_query.iter_mut() {
                 if layer.camera != event.camera {
                     continue;
                 }
-                layer_transform.translation.x += event.camera_move_speed.x * layer.speed.x;
-                layer_transform.translation.y += event.camera_move_speed.y * layer.speed.y;
+                layer_transform.translation.x += real_translation.x * layer.speed.x;
+                layer_transform.translation.y += real_translation.y * layer.speed.y;
             }
         }
     }
@@ -101,7 +121,7 @@ fn update_layer_textures_system(
     mut move_events: EventReader<ParallaxMoveEvent>,
 ) {
     for event in move_events.read() {
-        if !event.has_movement() {
+        if !event.has_translation() {
             continue;
         }
         let primary_window = window_query.get_single().unwrap();
@@ -116,32 +136,23 @@ fn update_layer_textures_system(
                     continue;
                 }
                 for &child in children.iter() {
-                    let (
-                        texture_gtransform,
-                        mut texture_transform,
-                        layer_texture,
-                        computed_visibility,
-                    ) = texture_query.get_mut(child).unwrap();
+                    let (texture_gtransform, mut texture_transform, layer_texture, computed_visibility) =
+                        texture_query.get_mut(child).unwrap();
                     // Do not move visible textures
                     if computed_visibility.get() {
                         continue;
                     }
                     let texture_gtransform = texture_gtransform.compute_transform();
-                    let texture_translation =
-                        camera_transform.translation - texture_gtransform.translation;
+                    let texture_translation = camera_transform.translation - texture_gtransform.translation;
                     if layer.repeat.has_horizontal() {
                         let x_delta = layer_texture.width * layer.texture_count.x;
                         let half_width = layer_texture.width * texture_gtransform.scale.x / 2.0;
                         // Move not visible right texture to left side of layer when camera is moving to left
-                        if event.has_left_movement()
-                            && texture_translation.x + half_width < -view_size.x
-                        {
+                        if event.has_left_translation() && texture_translation.x + half_width < -view_size.x {
                             texture_transform.translation.x -= x_delta;
                         }
                         // Move not visible left texture to right side of layer when camera is moving to right
-                        if event.has_right_movement()
-                            && texture_translation.x - half_width > view_size.x
-                        {
+                        if event.has_right_translation() && texture_translation.x - half_width > view_size.x {
                             texture_transform.translation.x += x_delta;
                         }
                     }
@@ -149,15 +160,11 @@ fn update_layer_textures_system(
                         let y_delta = layer_texture.height * layer.texture_count.y;
                         let half_height = layer_texture.height * texture_gtransform.scale.y / 2.0;
                         // Move not visible top texture to the bottom of the layer when the camera is moving to the bottom
-                        if event.has_down_movement()
-                            && texture_translation.y + half_height < -view_size.y
-                        {
+                        if event.has_down_translation() && texture_translation.y + half_height < -view_size.y {
                             texture_transform.translation.y -= y_delta;
                         }
                         // Move not visible bottom texture to the top of the layer when the camera is moving to the top
-                        if event.has_up_movement()
-                            && texture_translation.y - half_height > view_size.y
-                        {
+                        if event.has_up_translation() && texture_translation.y - half_height > view_size.y {
                             texture_transform.translation.y += y_delta;
                         }
                     }
@@ -165,4 +172,15 @@ fn update_layer_textures_system(
             }
         }
     }
+}
+
+#[cfg(doctest)]
+mod test_readme {
+    macro_rules! external_doc_test {
+        ($x:expr) => {
+            #[doc = $x]
+            extern "C" {}
+        };
+    }
+    external_doc_test!(include_str!("../README.md"));
 }

@@ -3,12 +3,15 @@ use std::time::Duration;
 use bevy::prelude::*;
 use serde::Deserialize;
 
+#[cfg(feature = "bevy-inspector-egui")]
+use bevy_inspector_egui::prelude::*;
 use crate::SpriteFrameUpdate;
 
 /// Layer speed type.
 /// Layers with horizontal or vertical speed are only able to travel in one direction,
 /// while bidirectional layers can be scrolled endlessly in both directions.
 #[derive(Debug, Deserialize)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub enum LayerSpeed {
     Horizontal(f32),
     Vertical(f32),
@@ -16,6 +19,7 @@ pub enum LayerSpeed {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub enum RepeatStrategy {
     Same,
     MirrorHorizontally,
@@ -45,6 +49,8 @@ impl RepeatStrategy {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
+#[cfg_attr(feature = "bevy-inspector-egui", reflect(InspectorOptions))]
 pub enum LayerRepeat {
     Horizontal(RepeatStrategy),
     Vertical(RepeatStrategy),
@@ -88,6 +94,7 @@ impl LayerRepeat {
 }
 
 #[derive(Debug, Deserialize, Resource)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub enum Animation {
     FPS(f32),
     FrameDuration(Duration),
@@ -113,6 +120,7 @@ impl Animation {
 /// Layer initialization data
 #[derive(Debug, Deserialize, Resource)]
 #[serde(default)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub struct LayerData {
     /// Relative speed of layer to the camera movement.
     /// If the speed value is set to 1.0, the layer won't move in that direction.
@@ -200,6 +208,7 @@ impl Default for LayerData {
 
 /// Core component for parallax layer
 #[derive(Component)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub struct LayerComponent {
     /// Relative speed of layer to the camera movement
     pub speed: Vec2,
@@ -213,6 +222,7 @@ pub struct LayerComponent {
 
 /// Core component for layer texture
 #[derive(Component)]
+#[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub struct LayerTextureComponent {
     /// Width of the texture
     pub width: f32,
