@@ -10,7 +10,7 @@ use crate::SpriteFrameUpdate;
 /// Layer speed type.
 /// Layers with horizontal or vertical speed are only able to travel in one direction,
 /// while bidirectional layers can be scrolled endlessly in both directions.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub enum LayerSpeed {
     Horizontal(f32),
@@ -93,7 +93,7 @@ impl LayerRepeat {
     }
 }
 
-#[derive(Debug, Deserialize, Resource)]
+#[derive(Debug, Deserialize, Resource, Clone)]
 #[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub enum Animation {
     FPS(f32),
@@ -118,7 +118,7 @@ impl Animation {
 }
 
 /// Layer initialization data
-#[derive(Debug, Deserialize, Resource)]
+#[derive(Debug, Deserialize, Resource, Clone)]
 #[serde(default)]
 #[cfg_attr(feature = "bevy-inspector-egui", derive(Reflect, InspectorOptions))]
 pub struct LayerData {
