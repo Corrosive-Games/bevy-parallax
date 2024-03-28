@@ -49,26 +49,26 @@ fn main() {
     app.run();
 }
 
-pub fn move_player_system(keyboard_input: Res<Input<KeyCode>>, time: Res<Time>, mut player_query: Query<(&mut Transform, &Player)>) {
+pub fn move_player_system(keyboard_input: Res<ButtonInput<KeyCode>>, time: Res<Time>, mut player_query: Query<(&mut Transform, &Player)>) {
     let mut rotation: f32 = 0.;
     let mut direction = Vec2::ZERO;
     for (mut player_transform, player) in player_query.iter_mut() {
-        if keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right) {
+        if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
             direction += Vec2::new(1., 0.);
         }
-        if keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left) {
+        if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
             direction += Vec2::new(-1., 0.)
         }
-        if keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up) {
+        if keyboard_input.pressed(KeyCode::KeyW) || keyboard_input.pressed(KeyCode::ArrowUp) {
             direction += Vec2::new(0., 1.);
         }
-        if keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down) {
+        if keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown) {
             direction += Vec2::new(0., -1.)
         }
-        if keyboard_input.pressed(KeyCode::E) {
+        if keyboard_input.pressed(KeyCode::KeyE) {
             rotation -= 1.;
         }
-        if keyboard_input.pressed(KeyCode::Q) {
+        if keyboard_input.pressed(KeyCode::KeyQ) {
             rotation += 1.;
         }
         direction = direction.normalize_or_zero() * player.lin_speed * time.delta_seconds();
