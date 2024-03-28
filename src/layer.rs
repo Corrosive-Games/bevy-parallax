@@ -8,7 +8,7 @@ use crate::SpriteFrameUpdate;
 /// Layer speed type.
 /// Layers with horizontal or vertical speed are only able to travel in one direction,
 /// while bidirectional layers can be scrolled endlessly in both directions.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum LayerSpeed {
     Horizontal(f32),
     Vertical(f32),
@@ -87,7 +87,7 @@ impl LayerRepeat {
     }
 }
 
-#[derive(Debug, Deserialize, Resource)]
+#[derive(Debug, Deserialize, Resource, Clone)]
 pub enum Animation {
     FPS(f32),
     FrameDuration(Duration),
@@ -111,7 +111,7 @@ impl Animation {
 }
 
 /// Layer initialization data
-#[derive(Debug, Deserialize, Resource)]
+#[derive(Debug, Deserialize, Resource, Clone)]
 #[serde(default)]
 pub struct LayerData {
     /// Relative speed of layer to the camera movement.
