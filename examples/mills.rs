@@ -151,7 +151,8 @@ pub fn move_camera_system(
         camera_transform.rotate_z(-0.1);
     }
     move_event_writer.send(ParallaxMoveEvent {
-        camera_move_speed: direction.normalize_or_zero() * speed,
+        translation: direction.normalize_or_zero() * speed,
         camera: camera,
+        rotation: 0.,
     });
 }

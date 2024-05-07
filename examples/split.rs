@@ -13,7 +13,7 @@ fn main() {
         title: "Split Screen".to_string(),
         resolution: (1280.0, 720.0).into(),
         resizable: false,
-        ..Default::default()
+        ..default()
     };
 
     App::new()
@@ -83,7 +83,7 @@ pub fn initialize_camera_system(
                 rows: 1,
                 scale: Vec2::splat(4.5),
                 z: 0.0,
-                ..Default::default()
+                ..default()
             },
             LayerData {
                 speed: LayerSpeed::Horizontal(0.6),
@@ -94,7 +94,7 @@ pub fn initialize_camera_system(
                 rows: 1,
                 scale: Vec2::splat(4.5),
                 z: 1.0,
-                ..Default::default()
+                ..default()
             },
             LayerData {
                 speed: LayerSpeed::Horizontal(0.1),
@@ -105,7 +105,7 @@ pub fn initialize_camera_system(
                 rows: 1,
                 scale: Vec2::splat(4.5),
                 z: 2.0,
-                ..Default::default()
+                ..default()
             },
         ],
         camera: left_camera,
@@ -120,7 +120,7 @@ pub fn initialize_camera_system(
                 rows: 1,
                 scale: Vec2::splat(3.0),
                 z: 0.0,
-                ..Default::default()
+                ..default()
             },
             LayerData {
                 speed: LayerSpeed::Bidirectional(0.1, 0.5),
@@ -130,7 +130,7 @@ pub fn initialize_camera_system(
                 rows: 1,
                 scale: Vec2::splat(4.0),
                 z: 1.0,
-                ..Default::default()
+                ..default()
             },
         ],
         camera: right_camera,
@@ -174,23 +174,27 @@ pub fn move_camera_system(
     for (camera, input_map) in camera_query.iter() {
         if keyboard_input.pressed(input_map.right) {
             move_event_writer.send(ParallaxMoveEvent {
-                camera_move_speed: Vec2::new(9.0, 0.0),
+                translation: Vec2::new(9.0, 0.0),
+                rotation: 0.,
                 camera: camera,
             });
         } else if keyboard_input.pressed(input_map.left) {
             move_event_writer.send(ParallaxMoveEvent {
-                camera_move_speed: Vec2::new(-9.0, 0.0),
+                translation: Vec2::new(-9.0, 0.0),
+                rotation: 0.,
                 camera: camera,
             });
         }
         if keyboard_input.pressed(input_map.up) {
             move_event_writer.send(ParallaxMoveEvent {
-                camera_move_speed: Vec2::new(0.0, 9.0),
+                translation: Vec2::new(0.0, 9.0),
+                rotation: 0.,
                 camera: camera,
             });
         } else if keyboard_input.pressed(input_map.down) {
             move_event_writer.send(ParallaxMoveEvent {
-                camera_move_speed: Vec2::new(0.0, -9.0),
+                translation: Vec2::new(0.0, -9.0),
+                rotation: 0.,
                 camera: camera,
             });
         }

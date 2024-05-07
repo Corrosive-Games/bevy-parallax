@@ -10,7 +10,7 @@ fn main() {
         title: "Sky".to_string(),
         resolution: (1280.0, 720.0).into(),
         resizable: false,
-        ..Default::default()
+        ..default()
     };
 
     App::new()
@@ -48,7 +48,7 @@ pub fn initialize_camera_system(
                 rows: 1,
                 scale: Vec2::splat(3.0),
                 z: 0.0,
-                ..Default::default()
+                ..default()
             },
             LayerData {
                 speed: LayerSpeed::Bidirectional(0.1, 0.5),
@@ -58,7 +58,7 @@ pub fn initialize_camera_system(
                 rows: 1,
                 scale: Vec2::splat(4.0),
                 z: 1.0,
-                ..Default::default()
+                ..default()
             },
         ],
         camera: camera,
@@ -74,23 +74,27 @@ pub fn move_camera_system(
     let camera = camera_query.get_single().unwrap();
     if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(3.0, 0.0),
+            translation: Vec2::new(3.0, 0.0),
+            rotation: 0.,
             camera: camera,
         });
     } else if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(-3.0, 0.0),
+            translation: Vec2::new(-3.0, 0.0),
+            rotation: 0.,
             camera: camera,
         });
     }
     if keyboard_input.pressed(KeyCode::KeyW) || keyboard_input.pressed(KeyCode::ArrowUp) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(0.0, 3.0),
+            translation: Vec2::new(0.0, 3.0),
+            rotation: 0.,
             camera: camera,
         });
     } else if keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown) {
         move_event_writer.send(ParallaxMoveEvent {
-            camera_move_speed: Vec2::new(0.0, -3.0),
+            translation: Vec2::new(0.0, -3.0),
+            rotation: 0.,
             camera: camera,
         });
     }
