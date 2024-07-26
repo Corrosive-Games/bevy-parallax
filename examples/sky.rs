@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use bevy_parallax::{
-    CreateParallaxEvent, LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent,
-    ParallaxPlugin, ParallaxSystems,
+    CreateParallaxEvent, LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxSystems,
 };
 
 fn main() {
@@ -30,10 +29,7 @@ fn main() {
 }
 
 // Put a ParallaxCameraComponent on the camera used for parallax
-pub fn initialize_camera_system(
-    mut commands: Commands,
-    mut create_parallax: EventWriter<CreateParallaxEvent>,
-) {
+pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: EventWriter<CreateParallaxEvent>) {
     let camera = commands
         .spawn(Camera2dBundle::default())
         .insert(ParallaxCameraComponent::default())
@@ -43,7 +39,7 @@ pub fn initialize_camera_system(
             LayerData {
                 speed: LayerSpeed::Bidirectional(0.9, 0.9),
                 path: "sky-stars.png".to_string(),
-                tile_size: Vec2::new(53.0, 55.0),
+                tile_size: UVec2::new(53, 55),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(3.0),
@@ -53,7 +49,7 @@ pub fn initialize_camera_system(
             LayerData {
                 speed: LayerSpeed::Bidirectional(0.1, 0.5),
                 path: "sky-clouds.png".to_string(),
-                tile_size: Vec2::new(109.0, 43.0),
+                tile_size: UVec2::new(109, 43),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.0),

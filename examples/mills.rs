@@ -2,8 +2,8 @@ use bevy::prelude::*;
 #[cfg(feature = "bevy-inspector-egui")]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_parallax::{
-    Animation, CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, ParallaxCameraComponent,
-    ParallaxMoveEvent, ParallaxPlugin, ParallaxSystems, RepeatStrategy,
+    Animation, CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin,
+    ParallaxSystems, RepeatStrategy,
 };
 
 fn main() {
@@ -28,7 +28,7 @@ fn main() {
     .add_plugins(ParallaxPlugin)
     .add_systems(Startup, initialize_camera_system)
     .add_systems(Update, move_camera_system.before(ParallaxSystems))
-    .insert_resource(ClearColor(Color::rgb_u8(156, 219, 248)));
+    .insert_resource(ClearColor(Color::srgb_u8(156, 219, 248)));
     #[cfg(feature = "bevy-inspector-egui")]
     app.add_plugins(WorldInspectorPlugin::new());
 
@@ -36,10 +36,7 @@ fn main() {
 }
 
 // Put a ParallaxCameraComponent on the camera used for parallax
-pub fn initialize_camera_system(
-    mut commands: Commands,
-    mut create_parallax: EventWriter<CreateParallaxEvent>,
-) {
+pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: EventWriter<CreateParallaxEvent>) {
     let camera = commands
         .spawn(Camera2dBundle::default())
         .insert(ParallaxCameraComponent::default())
@@ -50,7 +47,7 @@ pub fn initialize_camera_system(
                 speed: LayerSpeed::Bidirectional(0.99, 0.99),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "mills-back.png".to_string(),
-                tile_size: Vec2::new(1123., 794.),
+                tile_size: UVec2::new(1123, 794),
                 cols: 6,
                 rows: 1,
                 scale: Vec2::splat(0.15),
@@ -64,13 +61,13 @@ pub fn initialize_camera_system(
                 speed: LayerSpeed::Bidirectional(0.98, 0.98),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "mills-back.png".to_string(),
-                tile_size: Vec2::new(1123., 794.),
+                tile_size: UVec2::new(1123, 794),
                 cols: 6,
                 rows: 1,
                 scale: Vec2::splat(0.25),
                 z: 0.7,
                 position: Vec2::new(0., 50.),
-                color: Color::DARK_GRAY,
+                color: bevy::color::palettes::css::DARK_GRAY.into(),
                 index: 2,
                 animation: Some(Animation::FPS(28.)),
                 ..default()
@@ -79,13 +76,13 @@ pub fn initialize_camera_system(
                 speed: LayerSpeed::Bidirectional(0.95, 0.95),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "mills-back.png".to_string(),
-                tile_size: Vec2::new(1123., 794.),
+                tile_size: UVec2::new(1123, 794),
                 cols: 6,
                 rows: 1,
                 scale: Vec2::splat(0.5),
                 z: 0.8,
                 position: Vec2::new(0., 25.),
-                color: Color::GRAY,
+                color: bevy::color::palettes::css::GRAY.into(),
                 index: 5,
                 animation: Some(Animation::FPS(26.)),
                 ..default()
@@ -94,7 +91,7 @@ pub fn initialize_camera_system(
                 speed: LayerSpeed::Bidirectional(0.9, 0.9),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::MirrorBoth),
                 path: "mills-back.png".to_string(),
-                tile_size: Vec2::new(1123., 794.),
+                tile_size: UVec2::new(1123, 794),
                 cols: 6,
                 rows: 1,
                 scale: Vec2::splat(0.8),
@@ -108,7 +105,7 @@ pub fn initialize_camera_system(
                 speed: LayerSpeed::Bidirectional(0.8, 0.8),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::MirrorBoth),
                 path: "mills-front.png".to_string(),
-                tile_size: Vec2::new(750.0, 434.),
+                tile_size: UVec2::new(750, 434),
                 cols: 6,
                 rows: 1,
                 z: 1.0,

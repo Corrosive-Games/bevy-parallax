@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_parallax::{
     CameraFollow, CreateParallaxEvent, LayerData, LayerRepeat, LayerSpeed, Limit, ParallaxCameraComponent, ParallaxPlugin, ParallaxSystems,
-    RepeatStrategy, PID, Vec2Limit,
+    RepeatStrategy, Vec2Limit, PID,
 };
 
 #[derive(Component)]
@@ -43,7 +43,7 @@ fn main() {
     .add_plugins(ParallaxPlugin)
     .add_systems(Startup, initialize_camera_system)
     .add_systems(Update, move_player_system.before(ParallaxSystems))
-    .insert_resource(ClearColor(Color::rgb_u8(42, 0, 63)));
+    .insert_resource(ClearColor(Color::srgb_u8(42, 0, 63)));
     #[cfg(feature = "bevy-inspector-egui")]
     app.add_plugins(WorldInspectorPlugin::new());
     app.run();
@@ -85,7 +85,7 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
             Name::new("Player"),
             SpriteBundle {
                 sprite: Sprite {
-                    color: Color::YELLOW,
+                    color: bevy::color::palettes::css::YELLOW.into(),
                     custom_size: Some(Vec2::new(50.0, 50.0)),
                     ..default()
                 },
@@ -118,7 +118,7 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
                 speed: LayerSpeed::Bidirectional(0.9, 0.9),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_back.png".to_string(),
-                tile_size: Vec2::new(96.0, 160.0),
+                tile_size: UVec2::new(96, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
@@ -129,7 +129,7 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
                 speed: LayerSpeed::Bidirectional(0.7, 0.85),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_middle.png".to_string(),
-                tile_size: Vec2::new(144.0, 160.0),
+                tile_size: UVec2::new(144, 160),
                 scale: Vec2::splat(4.5),
                 z: 0.5,
                 flip: (true, false),
@@ -140,7 +140,7 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
                 speed: LayerSpeed::Bidirectional(0.6, 0.8),
                 repeat: LayerRepeat::horizontally(RepeatStrategy::Same),
                 path: "cyberpunk_middle.png".to_string(),
-                tile_size: Vec2::new(144.0, 160.0),
+                tile_size: UVec2::new(144, 160),
                 scale: Vec2::splat(4.5),
                 z: 1.0,
                 position: Vec2::new(0., -64.),
@@ -150,7 +150,7 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
                 speed: LayerSpeed::Bidirectional(0.1, 0.3),
                 repeat: LayerRepeat::both(RepeatStrategy::MirrorHorizontally),
                 path: "cyberpunk_front.png".to_string(),
-                tile_size: Vec2::new(272.0, 160.0),
+                tile_size: UVec2::new(272, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
