@@ -107,15 +107,7 @@ fn move_layers_system(
 /// Update layer positions to keep the effect going indefinitely
 fn update_layer_textures_system(
     layer_query: Query<(&LayerComponent, &Children)>,
-    mut texture_query: Query<
-        (
-            &GlobalTransform,
-            &mut Transform,
-            &LayerTextureComponent,
-            &ViewVisibility,
-        ),
-        Without<ParallaxCameraComponent>,
-    >,
+    mut texture_query: Query<(&GlobalTransform, &mut Transform, &LayerTextureComponent, &ViewVisibility), Without<ParallaxCameraComponent>>,
     camera_query: Query<(Entity, &Transform, &Camera), With<ParallaxCameraComponent>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     mut move_events: EventReader<ParallaxMoveEvent>,

@@ -3,9 +3,9 @@ use std::time::Duration;
 use bevy::prelude::*;
 use serde::Deserialize;
 
+use crate::SpriteFrameUpdate;
 #[cfg(feature = "bevy-inspector-egui")]
 use bevy_inspector_egui::prelude::*;
-use crate::SpriteFrameUpdate;
 
 /// Layer speed type.
 /// Layers with horizontal or vertical speed are only able to travel in one direction,
@@ -28,21 +28,21 @@ pub enum RepeatStrategy {
 }
 
 impl RepeatStrategy {
-    pub fn transform(&self, sprite_sheet_bundle: &mut SpriteSheetBundle, pos: (i32, i32)) {
+    pub fn transform(&self, sprite_bundle: &mut SpriteBundle, pos: (i32, i32)) {
         match self {
             Self::Same => (),
             Self::MirrorHorizontally => {
                 let (x, _) = pos;
-                sprite_sheet_bundle.sprite.flip_x ^= x % 2 != 0;
+                sprite_bundle.sprite.flip_x ^= x % 2 != 0;
             }
             Self::MirrorVertically => {
                 let (_, y) = pos;
-                sprite_sheet_bundle.sprite.flip_y ^= y % 2 != 0;
+                sprite_bundle.sprite.flip_y ^= y % 2 != 0;
             }
             Self::MirrorBoth => {
                 let (x, y) = pos;
-                sprite_sheet_bundle.sprite.flip_x ^= x % 2 != 0;
-                sprite_sheet_bundle.sprite.flip_y ^= y % 2 != 0;
+                sprite_bundle.sprite.flip_x ^= x % 2 != 0;
+                sprite_bundle.sprite.flip_y ^= y % 2 != 0;
             }
         }
     }
@@ -131,7 +131,7 @@ pub struct LayerData {
     /// Path to layer texture file
     pub path: String,
     /// Size of a tile of the texture
-    pub tile_size: Vec2,
+    pub tile_size: UVec2,
     /// Columns in the texture file
     pub cols: usize,
     /// Rows in the texture file
@@ -154,13 +154,7 @@ pub struct LayerData {
 
 impl LayerData {
     pub fn create_texture_atlas_layout(&self) -> TextureAtlasLayout {
-        TextureAtlasLayout::from_grid(
-            self.tile_size,
-            self.cols,
-            self.rows,
-            None,
-            None,
-        )
+        TextureAtlasLayout::from_grid(self.tile_size, self.cols as u32, self.rows as u32, None, None)
     }
 
     pub fn create_sprite(&self) -> Sprite {
@@ -174,15 +168,13 @@ impl LayerData {
 
     pub fn crate_layer_texture(&self) -> LayerTextureComponent {
         LayerTextureComponent {
-            width: self.tile_size.x,
-            height: self.tile_size.y,
+            width: self.tile_size.x as f32,
+            height: self.tile_size.y as f32,
         }
     }
 
     pub fn create_animation_bundle(&self) -> Option<impl Bundle> {
-        self.animation
-            .as_ref()
-            .map(|animation| animation.to_sprite_update(self))
+        self.animation.as_ref().map(|animation| animation.to_sprite_update(self))
     }
 }
 
@@ -192,7 +184,7 @@ impl Default for LayerData {
             speed: LayerSpeed::Horizontal(1.0),
             repeat: LayerRepeat::Bidirectional(RepeatStrategy::Same),
             path: "".to_string(),
-            tile_size: Vec2::ZERO,
+            tile_size: UVec2::ZERO,
             cols: 1,
             rows: 1,
             scale: Vec2::ONE,
