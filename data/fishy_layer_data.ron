@@ -2,91 +2,103 @@
 	(
 		speed: Horizontal(0.9),
 		path: "fishy_back.png",
-		tile_size: (256.0, 596.0),
+		tile_size: (256, 596),
 		cols: 1,
 		rows: 1,
 		scale: (1.25, 1.25),
 		z: 0.0,
-		color: Rgba(
-			red: 0.5,
-	        green: 0.8,
-        	blue: 1.,
-	        alpha: 1.,
-		)
+		color: Srgba(
+			(
+				red: 0.5,
+				green: 0.8,
+				blue: 1.,
+				alpha: 1.,
+			),
+		),
 	),
 	(
 		speed: Horizontal(0.8),
 		path: "fishy_middle_1.png",
-		tile_size: (256.0, 596.0),
+		tile_size: (256, 596),
 		cols: 1,
 		rows: 1,
 		scale: (1.25, 1.25),
 		z: 1.0,
-		color: Rgba(
-			red: 0.5,
-	        green: 0.8,
-        	blue: 1.,
-	        alpha: 1.,
-		)
+		color: Srgba(
+			(
+				red: 0.5,
+				green: 0.8,
+				blue: 1.,
+				alpha: 1.,
+			),
+		),
 	),
 	(
 		speed: Horizontal(0.6),
 		path: "fishy_middle_2.png",
-		tile_size: (256.0, 596.0),
+		tile_size: (256, 596),
 		cols: 1,
 		rows: 1,
 		scale: (1.25, 1.25),
 		z: 2.0,
-		color: Rgba(
-			red: 0.7,
-	        green: 0.6,
-        	blue: 0.4,
-	        alpha: 1.,
-		)
+		color: Srgba(
+			(
+				red: 0.7,
+				green: 0.6,
+				blue: 0.4,
+				alpha: 1.,
+			),
+		),
 	),
 	(
 		speed: Horizontal(0.5),
 		path: "fishy_middle_3.png",
-		tile_size: (256.0, 596.0),
+		tile_size: (256, 596),
 		cols: 1,
 		rows: 1,
 		scale: (1.25, 1.25),
 		z: 3.0,
-		color: Rgba(
-			red: 0.7,
-	        green: 0.6,
-        	blue: 0.4,
-	        alpha: 1.,
-		)
+		color: Srgba(
+			(
+				red: 0.7,
+				green: 0.6,
+				blue: 0.4,
+				alpha: 1.,
+			),
+		),
 	),
 	(
 		speed: Horizontal(0.4),
 		path: "fishy_middle_4.png",
-		tile_size: (256.0, 596.0),
+		tile_size: (256, 596),
 		cols: 1,
 		rows: 1,
 		scale: (1.25, 1.25),
 		z: 4.0,
-		color: Rgba(
-			red: 0.7,
-	        green: 0.6,
-        	blue: 0.4,
-	        alpha: 1.,
-		)
+		color: Srgba(
+			(
+				red: 0.7,
+				green: 0.6,
+				blue: 0.4,
+				alpha: 1.,
+			),
+		),
 	),
 	(
 		speed: Horizontal(0.2),
 		path: "fishy_front.png",
-		tile_size: (256.0, 596.0),
+		tile_size: (256, 596),
 		cols: 1,
 		rows: 1,
 		scale: (1.25, 1.25),
 		z: 5.0,
-		color: Rgba(
-			red: 0.7,
-	        green: 0.6,
-        	blue: 0.4,
-	        alpha: 1.,
-		)
+		color: Srgba(
+			(
+				red: 0.7,
+				green: 0.6,
+				blue: 0.4,
+				alpha: 1.,
+			),
+		),
 	),
 ]

@@ -25,8 +25,6 @@ fn main() {
         .add_systems(Startup, initialize_camera_system)
         .add_systems(Update, move_camera_system.before(ParallaxSystems))
         .run();
-
-    todo!("fishy_layer_data.ron does not work");
 }
 
 // Put a ParallaxCameraComponent on the camera used for parallax
