@@ -50,7 +50,7 @@ pub fn initialize_camera_system(
             LayerData {
                 speed: LayerSpeed::Horizontal(0.9),
                 path: "cyberpunk_back.png".to_string(),
-                tile_size: Vec2::new(96.0, 160.0),
+                tile_size: UVec2::new(96, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
@@ -60,7 +60,7 @@ pub fn initialize_camera_system(
             LayerData {
                 speed: LayerSpeed::Horizontal(0.6),
                 path: "cyberpunk_middle.png".to_string(),
-                tile_size: Vec2::new(144.0, 160.0),
+                tile_size: UVec2::new(144, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
@@ -70,7 +70,7 @@ pub fn initialize_camera_system(
             LayerData {
                 speed: LayerSpeed::Horizontal(0.1),
                 path: "cyberpunk_front.png".to_string(),
-                tile_size: Vec2::new(272.0, 160.0),
+                tile_size: UVec2::new(272, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
@@ -109,13 +109,12 @@ pub fn move_camera_system(
 
 Compatibility of `bevy-parallax` versions:
 
-| Bevy version | `bevy-parallax` version     |
-|:-------------|:----------------------------|
-| `0.13`       | `0.8`                       |
-| `0.12`       | `0.7`                       |
-| `0.11`       | `0.5` - `0.6`               |
-| `0.10`       | `0.4`                       |
-
+| Bevy version | `bevy-parallax` version |
+| :----------- | :---------------------- |
+| `0.13`       | `0.8`                   |
+| `0.12`       | `0.7`                   |
+| `0.11`       | `0.5` - `0.6`           |
+| `0.10`       | `0.4`                   |
 
 ## Credits
 

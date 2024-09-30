@@ -27,13 +27,9 @@ impl CreateParallaxEvent {
             let texture_atlas = layer.create_texture_atlas_layout();
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-            let sprite_sheet_bundle = SpriteSheetBundle {
+            let sprite_bundle = SpriteBundle {
                 texture,
                 sprite: layer.create_sprite(),
-                atlas: TextureAtlas {
-                    layout: texture_atlas_handle,
-                    index: 0,
-                },
                 ..default()
             };
 
@@ -48,12 +44,12 @@ impl CreateParallaxEvent {
             let max_length = window_size.length();
 
             let y_max_index = match layer.repeat.has_vertical() {
-                true => f32::ceil(max_length / (layer.tile_size.y * layer.scale.y)) as i32,
+                true => f32::ceil(max_length / (layer.tile_size.y as f32 * layer.scale.y)) as i32,
                 false => 0,
             };
 
             let x_max_index = match layer.repeat.has_horizontal() {
-                true => f32::ceil(max_length / (layer.tile_size.x * layer.scale.x)) as i32,
+                true => f32::ceil(max_length / (layer.tile_size.x as f32 * layer.scale.x)) as i32,
                 false => 0,
             };
 
@@ -74,7 +70,7 @@ impl CreateParallaxEvent {
             let mut entity_commands = commands.spawn_empty();
             entity_commands
                 .insert(Name::new(format!("Parallax Layer ({})", i)))
-                .insert(RenderLayers::from_layers(&[render_layer]))
+                .insert(RenderLayers::from_layers(&[render_layer.into()]))
                 .insert(SpatialBundle {
                     transform: Transform {
                         translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
@@ -87,15 +83,19 @@ impl CreateParallaxEvent {
                     for x in x_range {
                         for y in y_range.clone() {
                             let repeat_strategy = layer.repeat.get_strategy();
-                            let mut adjusted_spritesheet_bundle = sprite_sheet_bundle.clone();
-                            repeat_strategy.transform(&mut adjusted_spritesheet_bundle, (x, y));
-                            adjusted_spritesheet_bundle.transform.translation.x =
-                                layer.tile_size.x * x as f32;
-                            adjusted_spritesheet_bundle.transform.translation.y =
-                                layer.tile_size.y * y as f32;
-                            let mut child_commands = parent.spawn(adjusted_spritesheet_bundle);
+                            let mut adjusted_sprite_bundle = sprite_bundle.clone();
+                            repeat_strategy.transform(&mut adjusted_sprite_bundle, (x, y));
+                            adjusted_sprite_bundle.transform.translation.x = layer.tile_size.x as f32 * x as f32;
+                            adjusted_sprite_bundle.transform.translation.y = layer.tile_size.y as f32 * y as f32;
+                            let mut child_commands = parent.spawn((
+                                adjusted_sprite_bundle,
+                                TextureAtlas {
+                                    layout: texture_atlas_handle.clone(),
+                                    index: 0,
+                                },
+                            ));
                             child_commands
-                                .insert(RenderLayers::from_layers(&[render_layer]))
+                                .insert(RenderLayers::from_layers(&[render_layer.into()]))
                                 .insert(layer.crate_layer_texture());
                             if let Some(animation_bundle) = layer.create_animation_bundle() {
                                 child_commands.insert(animation_bundle);
@@ -116,7 +116,7 @@ impl CreateParallaxEvent {
                     texture_count,
                     camera: self.camera,
                 })
-                .insert(RenderLayers::from_layers(&[render_layer]));
+                .insert(RenderLayers::from_layers(&[render_layer.into()]));
         }
     }
 }

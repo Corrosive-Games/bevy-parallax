@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use bevy_parallax::{
-    CreateParallaxEvent, LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent,
-    ParallaxPlugin, ParallaxSystems,
+    CreateParallaxEvent, LayerData, LayerSpeed, ParallaxCameraComponent, ParallaxMoveEvent, ParallaxPlugin, ParallaxSystems,
 };
 
 fn main() {
@@ -36,7 +35,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
             LayerData {
                 speed: LayerSpeed::Horizontal(0.9),
                 path: "cyberpunk_back.png".to_string(),
-                tile_size: Vec2::new(96.0, 160.0),
+                tile_size: UVec2::new(96, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
@@ -46,7 +45,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
             LayerData {
                 speed: LayerSpeed::Horizontal(0.6),
                 path: "cyberpunk_middle.png".to_string(),
-                tile_size: Vec2::new(144.0, 160.0),
+                tile_size: UVec2::new(144, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
@@ -56,7 +55,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
             LayerData {
                 speed: LayerSpeed::Horizontal(0.1),
                 path: "cyberpunk_front.png".to_string(),
-                tile_size: Vec2::new(272.0, 160.0),
+                tile_size: UVec2::new(272, 160),
                 cols: 1,
                 rows: 1,
                 scale: Vec2::splat(4.5),
@@ -69,10 +68,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
 }
 
 // Put a ParallaxCameraComponent on the camera used for parallax
-pub fn initialize_camera_system(
-    mut commands: Commands,
-    mut create_parallax: EventWriter<CreateParallaxEvent>,
-) {
+pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: EventWriter<CreateParallaxEvent>) {
     let camera = commands
         .spawn(Camera2dBundle::default())
         .insert(ParallaxCameraComponent::default())

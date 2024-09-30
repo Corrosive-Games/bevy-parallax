@@ -13,19 +13,19 @@ exclude = ["assets/*"]
 
 [dependencies]
 serde = { version = "1.0.180", optional = false }
-bevy-inspector-egui = { version = "0.24", optional = true }
+bevy-inspector-egui = { version = "0.25", optional = true }
 
 [dependencies.bevy]
-version = "0.13.0"
+version = "0.14.0"
 default-features = false
 features = ["bevy_render", "bevy_core_pipeline", "bevy_sprite", "bevy_asset"]
 
 [dev-dependencies]
-bevy-inspector-egui = "0.24"
+bevy-inspector-egui = "0.25"
 ron = "0.8.0"
 
 [dev-dependencies.bevy]
-version = "0.13"
+version = "0.14"
 default-features = false
 features = ["x11", "png"]
 
