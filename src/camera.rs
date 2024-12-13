@@ -30,9 +30,9 @@ impl Default for PID {
 impl PID {
     pub fn new(kp: f32, ki: f32, kd: f32) -> Self {
         Self {
-            kp: kp,
-            ki: ki,
-            kd: kd,
+            kp,
+            ki,
+            kd,
             ..default()
         }
     }
@@ -201,7 +201,7 @@ pub struct TranslationStrategy {
 
 impl TranslationStrategy {
     pub fn new(x: LinearAxisStrategy, y: LinearAxisStrategy) -> Self {
-        Self { x: x, y: y }
+        Self { x, y }
     }
 
     pub fn translation(&mut self, seconds: f32, target: Vec2, current: Vec2) -> Vec2 {
@@ -332,7 +332,7 @@ pub fn camera_follow_system(
 ) {
     for (camera, camera_transform, mut follow) in query.iter_mut() {
         if let Ok(target_transform) = transform_query.get(follow.target) {
-            let seconds = time.delta_seconds();
+            let seconds = time.delta_secs();
             let target = target_transform.mul_transform(Transform::from_translation(follow.offset.extend(0.)));
             let camera_movement =
                 follow
@@ -345,7 +345,7 @@ pub fn camera_follow_system(
             );
             event_writer.send(ParallaxMoveEvent {
                 translation: camera_movement,
-                camera: camera,
+                camera,
                 rotation: camera_rotation,
             });
         }

@@ -27,11 +27,7 @@ impl CreateParallaxEvent {
             let texture_atlas = layer.create_texture_atlas_layout();
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-            let sprite_bundle = SpriteBundle {
-                texture,
-                sprite: layer.create_sprite(),
-                ..default()
-            };
+            let sprite_bundle = layer.create_sprite(texture, TextureAtlas::from(texture_atlas_handle));
 
             // Spawn a grid of textures, so that they convincingly wrap around the screen when scrolling.
             // For no repeat layers, only spawn a single row or column in direction of their movement.
@@ -71,29 +67,22 @@ impl CreateParallaxEvent {
             entity_commands
                 .insert(Name::new(format!("Parallax Layer ({})", i)))
                 .insert(RenderLayers::from_layers(&[render_layer.into()]))
-                .insert(SpatialBundle {
-                    transform: Transform {
-                        translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
-                        scale: layer.scale.extend(1.0),
-                        ..default()
-                    },
+                .insert((Transform {
+                    translation: Vec3::new(layer.position.x, layer.position.y, layer.z),
+                    scale: layer.scale.extend(1.0),
                     ..default()
-                })
+                }, Visibility::Visible))
                 .with_children(|parent| {
                     for x in x_range {
                         for y in y_range.clone() {
                             let repeat_strategy = layer.repeat.get_strategy();
-                            let mut adjusted_sprite_bundle = sprite_bundle.clone();
-                            repeat_strategy.transform(&mut adjusted_sprite_bundle, (x, y));
-                            adjusted_sprite_bundle.transform.translation.x = layer.tile_size.x as f32 * x as f32;
-                            adjusted_sprite_bundle.transform.translation.y = layer.tile_size.y as f32 * y as f32;
-                            let mut child_commands = parent.spawn((
-                                adjusted_sprite_bundle,
-                                TextureAtlas {
-                                    layout: texture_atlas_handle.clone(),
-                                    index: 0,
-                                },
-                            ));
+                            let mut adjusted_sprite = sprite_bundle.clone();
+                            repeat_strategy.transform(&mut adjusted_sprite, (x, y));
+
+                            let mut transform = Transform::default();
+                            transform.translation.x = layer.tile_size.x as f32 * x as f32;
+                            transform.translation.y = layer.tile_size.y as f32 * y as f32;
+                            let mut child_commands = parent.spawn((adjusted_sprite, transform));
                             child_commands
                                 .insert(RenderLayers::from_layers(&[render_layer.into()]))
                                 .insert(layer.crate_layer_texture());
@@ -182,7 +171,7 @@ impl Default for Limit {
 
 impl Limit {
     pub fn new(min: f32, max: f32) -> Self {
-        Self { min: min, max: max }
+        Self { min, max }
     }
 
     pub fn zero_to_infinity() -> Self {
@@ -193,7 +182,7 @@ impl Limit {
     }
 
     pub fn zero_to(max: f32) -> Self {
-        Self { min: 0., max: max }
+        Self { min: 0., max }
     }
 
     pub fn fix(&self, value: f32) -> f32 {
@@ -211,7 +200,7 @@ pub struct Vec2Limit {
 
 impl Vec2Limit {
     pub fn new(x: Limit, y: Limit) -> Self {
-        Self { x: x, y: y }
+        Self { x, y }
     }
 
     pub fn fix(&self, vec: Vec2) -> Vec2 {
@@ -235,7 +224,7 @@ impl ParallaxCameraComponent {
 
     pub fn new(render_layer: u8) -> Self {
         Self {
-            render_layer: render_layer,
+            render_layer,
             ..default()
         }
     }

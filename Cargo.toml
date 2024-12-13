@@ -1,6 +1,6 @@
 [package]
 name = "bevy-parallax"
-version = "0.10.0"
+version = "0.11.0"
 authors = ["Carlo Supina <cdsupina@gmail.com>"]
 edition = "2021"
 description = "A Bevy plugin for creating a parallax effect."
@@ -13,19 +13,19 @@ exclude = ["assets/*"]
 
 [dependencies]
 serde = { version = "1.0.180", optional = false }
-bevy-inspector-egui = { version = "0.25", optional = true }
+bevy-inspector-egui = { version = "0.28", optional = true }
 
 [dependencies.bevy]
-version = "0.14.0"
+version = "0.15.0"
 default-features = false
-features = ["bevy_render", "bevy_core_pipeline", "bevy_sprite", "bevy_asset"]
+features = ["bevy_render", "bevy_core_pipeline", "bevy_sprite", "bevy_asset", "bevy_window"]
 
 [dev-dependencies]
 bevy-inspector-egui = "0.25"
 ron = "0.8.0"
 
 [dev-dependencies.bevy]
-version = "0.14"
+version = "0.15"
 default-features = false
 features = ["x11", "png"]
 

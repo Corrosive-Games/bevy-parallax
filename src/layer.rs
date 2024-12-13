@@ -28,21 +28,21 @@ pub enum RepeatStrategy {
 }
 
 impl RepeatStrategy {
-    pub fn transform(&self, sprite_bundle: &mut SpriteBundle, pos: (i32, i32)) {
+    pub fn transform(&self, sprite: &mut Sprite, pos: (i32, i32)) {
         match self {
             Self::Same => (),
             Self::MirrorHorizontally => {
                 let (x, _) = pos;
-                sprite_bundle.sprite.flip_x ^= x % 2 != 0;
+                sprite.flip_x ^= x % 2 != 0;
             }
             Self::MirrorVertically => {
                 let (_, y) = pos;
-                sprite_bundle.sprite.flip_y ^= y % 2 != 0;
+                sprite.flip_y ^= y % 2 != 0;
             }
             Self::MirrorBoth => {
                 let (x, y) = pos;
-                sprite_bundle.sprite.flip_x ^= x % 2 != 0;
-                sprite_bundle.sprite.flip_y ^= y % 2 != 0;
+                sprite.flip_x ^= x % 2 != 0;
+                sprite.flip_y ^= y % 2 != 0;
             }
         }
     }
@@ -157,8 +157,10 @@ impl LayerData {
         TextureAtlasLayout::from_grid(self.tile_size, self.cols as u32, self.rows as u32, None, None)
     }
 
-    pub fn create_sprite(&self) -> Sprite {
+    pub fn create_sprite(&self, image: Handle<Image>, atlas: TextureAtlas) -> Sprite {
         Sprite {
+            image,
+            texture_atlas: Some(atlas),
             color: self.color,
             flip_x: self.flip.0,
             flip_y: self.flip.1,

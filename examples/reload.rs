@@ -70,7 +70,7 @@ pub fn new_create_parallax_event(camera: Entity) -> CreateParallaxEvent {
 // Put a ParallaxCameraComponent on the camera used for parallax
 pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: EventWriter<CreateParallaxEvent>) {
     let camera = commands
-        .spawn(Camera2dBundle::default())
+        .spawn(Camera2d::default())
         .insert(ParallaxCameraComponent::default())
         .id();
     create_parallax.send(new_create_parallax_event(camera));
