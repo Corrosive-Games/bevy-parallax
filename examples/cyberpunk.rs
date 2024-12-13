@@ -71,8 +71,8 @@ pub fn move_player_system(keyboard_input: Res<ButtonInput<KeyCode>>, time: Res<T
         if keyboard_input.pressed(KeyCode::KeyQ) {
             rotation += 1.;
         }
-        direction = direction.normalize_or_zero() * player.lin_speed * time.delta_seconds();
-        rotation = rotation * player.ang_speed * time.delta_seconds();
+        direction = direction.normalize_or_zero() * player.lin_speed * time.delta_secs();
+        rotation = rotation * player.ang_speed * time.delta_secs();
         player_transform.translation += direction.extend(0.);
         player_transform.rotate_z(rotation);
     }
@@ -83,15 +83,12 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
     let player = commands
         .spawn((
             Name::new("Player"),
-            SpriteBundle {
-                sprite: Sprite {
-                    color: bevy::color::palettes::css::YELLOW.into(),
-                    custom_size: Some(Vec2::new(50.0, 50.0)),
-                    ..default()
-                },
-                transform: Transform::from_translation(Vec2::ZERO.extend(3.)),
+            Sprite {
+                color: bevy::color::palettes::css::YELLOW.into(),
+                custom_size: Some(Vec2::new(50.0, 50.0)),
                 ..default()
             },
+            Transform::from_translation(Vec2::ZERO.extend(3.)),
             Player::default(),
         ))
         .id();
@@ -100,10 +97,7 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
     let y_pid = x_pid.with_integral_limit(Limit::new(-25., 25.));
     let offset = Vec2::new(200., 0.);
     let camera = commands
-        .spawn(Camera2dBundle {
-            transform: Transform::from_translation(offset.extend(0.)),
-            ..default()
-        })
+        .spawn((Camera2d::default(), Transform::from_translation(offset.extend(0.))))
         //.insert(CameraFollow::fixed(player).with_offset(offset))
         //.insert(CameraFollow::proportional(player, 0.1).with_offset(offset))
         .insert(CameraFollow::pid_xyz(player, &x_pid, &y_pid, &x_pid).with_offset(offset))
@@ -158,6 +152,6 @@ pub fn initialize_camera_system(mut commands: Commands, mut create_parallax: Eve
                 ..default()
             },
         ],
-        camera: camera,
+        camera,
     });
 }

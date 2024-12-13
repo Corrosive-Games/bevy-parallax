@@ -1,4 +1,5 @@
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::{prelude::*};
+use bevy::window::PrimaryWindow;
 
 pub mod camera;
 pub mod layer;
@@ -49,12 +50,11 @@ fn create_parallax_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
+    primary_window: Single<&Window, With<PrimaryWindow>>,
     parallax_query: Query<(Entity, &ParallaxCameraComponent, &Camera)>,
     layers_query: Query<(Entity, &LayerComponent)>,
     mut create_parallax_events: EventReader<CreateParallaxEvent>,
 ) {
-    let primary_window = window_query.get_single().unwrap();
     let mut window_size = Vec2::new(primary_window.width(), primary_window.height());
     for event in create_parallax_events.read() {
         if let Ok((parallax_entity, parallax, camera)) = parallax_query.get(event.camera) {

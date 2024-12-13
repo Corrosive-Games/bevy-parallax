@@ -1,6 +1,7 @@
 # bevy-parallax
 
-A parallax plugin for the [Bevy Engine](https://bevyengine.org/). This plugin allows you to easily create scrolling parallax backgrounds for your games.
+A parallax plugin for the [Bevy Engine](https://bevyengine.org/). This plugin allows you to easily create scrolling
+parallax backgrounds for your games.
 
 ![cyberpunk](assets/cyberpunk.gif)
 
@@ -42,7 +43,7 @@ pub fn initialize_camera_system(
     mut create_parallax: EventWriter<CreateParallaxEvent>
 ) {
     let camera = commands
-        .spawn(Camera2dBundle::default())
+        .spawn(Camera2d::default())
         .insert(ParallaxCameraComponent::default())
         .id();
     let event = CreateParallaxEvent {
@@ -110,7 +111,9 @@ pub fn move_camera_system(
 Compatibility of `bevy-parallax` versions:
 
 | Bevy version | `bevy-parallax` version |
-| :----------- | :---------------------- |
+|:-------------|:------------------------|
+| `0.15`       | `11`                    |
+| `0.14`       | `0.9` - `0.10`          |
 | `0.13`       | `0.8`                   |
 | `0.12`       | `0.7`                   |
 | `0.11`       | `0.5` - `0.6`           |
